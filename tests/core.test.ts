@@ -54,6 +54,9 @@ describe('URL defense', () => {
     expect(scanUrls('join superteam.gift now', ['superteam.fun']).some((f) => f.suspicious)).toBe(true));
   it('benign bare domain not flagged', () => expect(scanUrls('i use github.com daily').length).toBe(0));
   it('blocklist flagged', () => expect(scanUrls('go to evil.com', [], ['evil.com']).some((f) => f.suspicious)).toBe(true));
+  it('flags bare homoglyph domain (no scheme)', () =>
+    expect(scanUrls('join ѕupеrtеam.fun now', ['superteam.fun']).some((f) => f.suspicious)).toBe(true));
+  it('does not flag a benign bare domain', () => expect(scanUrls('repo at github.com today').length).toBe(0));
   it('unshorten catches lookalike', async () => {
     const r = await scanWithUnshorten('see https://bit.ly/x', ['superteam.fun'], [], async () => 'http://supеrtеam.fun');
     expect(r.some((f) => f.suspicious)).toBe(true);
