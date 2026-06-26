@@ -1,6 +1,6 @@
 # Foka AI — Community Moderation Skill
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Tests](https://img.shields.io/badge/tests-84%20passing-blue.svg) ![Lang](https://img.shields.io/badge/8%20languages-EN%2FPT%2FES%2FID%2FVI%2FTR%2FRU%2FZH-orange.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg) ![Lang](https://img.shields.io/badge/8%20languages-EN%2FPT%2FES%2FID%2FVI%2FTR%2FRU%2FZH-orange.svg)
 
 **The only community-safety skill in the bounty.** Every Solana project, DAO, and launch runs a Telegram/Discord — and loses users and trust to wallet drainers, seed-phrase phishing, and admin impersonation **every day**. Foka AI is an agent skill that keeps a community **safe** and **answered**: it moderates scams, manages member contacts, triages support, and routes questions to the right person — **safe by design**, with humans gating anything irreversible.
 

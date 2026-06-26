@@ -16,6 +16,7 @@ describe('normalization (anti-evasion)', () => {
   it('bounds huge input', () =>
     expect(moderateMessage({ text: 'a'.repeat(50000), memberTrust: 'MEMBER', accountAgeDays: 30 }).action).toBe('allow'));
   it('preserves genuine Cyrillic (Russian)', () => expect(normalizeForMatch('кошелек')).toBe('кошелек'));
+  it('folds Greek homoglyphs in mixed tokens', () => expect(normalizeForMatch('clαim')).toBe('claim'));
 });
 
 describe('scam detection (EN/PT/ES)', () => {
