@@ -112,10 +112,11 @@ export function moderateMessage(input: MessageInput): Decision {
   const reasons: string[] = [];
   let score = 0;
 
-  const skeleton = normalizeForMatch(input.text);
+  const text = (input.text ?? '').slice(0, 10000); // bound ALL processing (scanUrls + mentions too), not just normalize
+  const skeleton = normalizeForMatch(text);
   // Mentions/links read from RAW text (before confusable folding).
-  const mentions = input.mentionCount ?? (input.text.match(/@\w+/g) || []).length;
-  const urls = scanUrls(input.text, input.officialDomains ?? [], input.blocklistDomains ?? []);
+  const mentions = input.mentionCount ?? (text.match(/@\w+/g) || []).length;
+  const urls = scanUrls(text, input.officialDomains ?? [], input.blocklistDomains ?? []);
   const hasLink = urls.length > 0;
   const suspiciousUrl = urls.some((u) => u.suspicious);
   const repeated = input.repeatedCount ?? 0;
@@ -171,6 +172,6 @@ export function moderateMessage(input: MessageInput): Decision {
     confidence,
     reasons,
     escalate: severity === 'high' || strong,
-    contentHash: contentHash(input.text),
+    contentHash: contentHash(text),
   };
 }

@@ -49,13 +49,16 @@ client.on(Events.MessageCreate, async (message: Message) => {
     officialDomains: OFFICIAL_DOMAINS,
   });
 
+  // TRUSTED members (mods, vouched) are never auto-actioned — a scam WARNING from a mod
+  // contains scam keywords too. We still escalate for human review below.
+  const enforce = rec.trustState !== 'TRUSTED';
   // Always remove flagged content (do NOT gate deletion on the self rate-limiter).
-  if (decision.action === 'delete' || decision.action === 'mute') {
+  if (enforce && (decision.action === 'delete' || decision.action === 'mute')) {
     await message.delete().catch(() => {});
     await members.recordWarning(id, { reason: decision.reasons.join(','), signal: decision.reasons[0] ?? 'n/a', actor: 'agent' });
   }
   // Throttle the heavier mute; escalate if the limiter trips. 1h timeout matches policy.
-  if (decision.action === 'mute') {
+  if (enforce && decision.action === 'mute') {
     if (actions.allow()) {
       await message.member?.timeout(60 * 60_000, 'auto-mute 1h (appealable)').catch(() => {});
     } else {

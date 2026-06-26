@@ -47,14 +47,17 @@ bot.on('message:text', async (ctx) => {
     officialDomains: OFFICIAL_DOMAINS,
   });
 
+  // TRUSTED members (mods, vouched) are never auto-actioned — a scam WARNING from a mod
+  // contains scam keywords too. We still escalate for human review below.
+  const enforce = rec.trustState !== 'TRUSTED';
   // Always remove flagged content (deletion is safe + reversible). Do NOT gate this on
   // the self rate-limiter, or a raid slips through once the bucket drains.
-  if (decision.action === 'delete' || decision.action === 'mute') {
+  if (enforce && (decision.action === 'delete' || decision.action === 'mute')) {
     await ctx.deleteMessage().catch(() => {});
     await members.recordWarning(id, { reason: decision.reasons.join(','), signal: decision.reasons[0] ?? 'n/a', actor: 'agent' });
   }
   // Mute is heavier — throttle it; if the limiter trips, escalate instead of mass-muting.
-  if (decision.action === 'mute') {
+  if (enforce && decision.action === 'mute') {
     if (actions.allow()) {
       await ctx.restrictChatMember(ctx.from!.id, { can_send_messages: false }, { until_date: Math.floor(Date.now() / 1000) + 3600 }).catch(() => {});
     } else {

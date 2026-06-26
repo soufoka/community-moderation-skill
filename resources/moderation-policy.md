@@ -46,6 +46,8 @@ The full decision logic behind the summary in `SKILL.md`. All thresholds are def
 
 Never auto-ban on a single low-confidence signal. When unsure, prefer **delete + explain + flag** over punishment.
 
+**Trusted members are escalated, not auto-actioned.** A `TRUSTED` member (mod/vouched) who trips a scam pattern is almost always *warning others* — scam-warning messages ("never share your seed phrase") contain the same keywords. Flag for human review; never auto-delete/mute a trusted account.
+
 ## Raid protocol
 
 **Detect:** ≥ `raidJoinSpike` joins (default 10) within `raidWindowSec` (default 120), or many `NEW` accounts posting similar content.
