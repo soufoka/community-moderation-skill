@@ -1,0 +1,33 @@
+{
+  "name": "community-moderation-skill",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Foka AI — evasion-resistant, multilingual (EN/PT/ES) community moderation & member-support skill for Solana Telegram/Discord communities.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "smoke": "tsx examples/selftest.ts"
+  },
+  "keywords": [
+    "solana",
+    "community",
+    "moderation",
+    "anti-scam",
+    "telegram",
+    "discord",
+    "agent-skill",
+    "claude"
+  ],
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@types/node": "^22.0.0",
+    "discord.js": "^14.16.0",
+    "grammy": "^1.30.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "zod": "^3.23.8"
+  }
+}

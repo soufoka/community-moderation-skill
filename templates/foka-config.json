@@ -1,0 +1,89 @@
+{
+  "community": {
+    "name": "REPLACE_ME Community",
+    "platform": "telegram",
+    "officialDomains": ["superteam.fun", "earn.superteam.fun"],
+    "pinnedRulesUrl": "REPLACE_ME",
+    "languages": ["en", "pt"]
+  },
+  "trust": {
+    "promoteAfterMessages": 5,
+    "promoteAfterDays": 2,
+    "flagDecayDays": 14,
+    "newMemberNoLinks": true,
+    "newMemberNoMedia": true
+  },
+  "moderation": {
+    "muteDurations": ["1h", "24h"],
+    "autoBanKnownScam": false,
+    "confidenceFloorForDelete": 0.6,
+    "confidenceFloorForMute": 0.6,
+    "confidenceFloorForBan": 0.85,
+    "bannedSubstrings": [
+      "validate your wallet",
+      "sync your wallet",
+      "seed phrase",
+      "validar carteira",
+      "frase de recuperacao"
+    ],
+    "_note_bannedSubstrings": "Matched as NORMALIZED substrings (examples/normalize.ts), never compiled as raw regex — avoids ReDoS."
+  },
+  "adjudication": {
+    "grayZoneLow": 30,
+    "grayZoneHigh": 60,
+    "useLlmInGrayZone": true,
+    "_note": "When score is in [low,high], optionally call an LLM judge (examples/llm-adjudicator.ts). The message is passed as data, never as instructions."
+  },
+  "enrichment": {
+    "checkTokensWithSkills": true,
+    "_note": "Resolve token mints / addresses via birdeye/helius/wallet-analysis and feed externalSignals (examples/enrich-token.ts)."
+  },
+  "raid": {
+    "joinSpike": 10,
+    "windowSec": 120,
+    "accountAgeDays": 7,
+    "clearMinutes": 15,
+    "slowModeSec": 30
+  },
+  "selfGuards": {
+    "ignoreOwnMessages": true,
+    "ignoreOtherBots": true,
+    "maxActionsPerMinute": 20,
+    "circuitBreakerActionsPerMinute": 40
+  },
+  "reporting": {
+    "minTrustToReport": "MEMBER",
+    "brigadingWindowSec": 300,
+    "minIndependentReports": 3,
+    "dedupeByContentHash": true
+  },
+  "privacy": {
+    "storeRawMessages": false,
+    "logRetentionDays": 30,
+    "redactPatterns": ["seed phrase", "private key", "frase de recuperacao"],
+    "honorDeleteRequests": true
+  },
+  "escalation": {
+    "modChannel": "REPLACE_ME",
+    "contacts": ["@REPLACE_ME_admin"]
+  },
+  "routing": {
+    "defaultPersona": "triage",
+    "defaultChannel": "#support",
+    "routes": {
+      "payout-issue": { "persona": "ops", "channel": "#ops" },
+      "wallet-help": { "persona": "support", "channel": "#support" },
+      "transaction-issue": { "persona": "support", "channel": "#support" },
+      "submission-help": { "persona": "bounty-lead", "channel": "#bounties" },
+      "bounty-question": { "persona": "bounty-lead", "channel": "#bounties" },
+      "technical-dev": { "persona": "dev", "channel": "#dev" },
+      "bug-report": { "persona": "dev", "channel": "#dev" },
+      "partnership": { "persona": "bd", "channel": "#partnerships" },
+      "feedback": { "persona": "product", "channel": "#feedback" }
+    }
+  },
+  "secrets": {
+    "_note": "Bot token comes from env BOT_TOKEN / a secret manager. NEVER store tokens in this file or the repo.",
+    "botTokenEnv": "BOT_TOKEN"
+  }
+}
