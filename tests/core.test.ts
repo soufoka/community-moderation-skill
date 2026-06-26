@@ -7,6 +7,7 @@ import { InMemoryMemberStore, newMember, adjustReputation, vouch, maybePromote }
 import { RateLimiter, IdempotencyStore } from '../examples/rate-limiter';
 import { assessToken, extractMints } from '../examples/enrich-token';
 import { checkImpersonation } from '../examples/impersonation';
+import { renderWelcome } from '../examples/welcome';
 
 describe('normalization (anti-evasion)', () => {
   it('folds homoglyphs', () => expect(normalizeForMatch('сlаiм')).toBe('claim'));
@@ -198,4 +199,16 @@ describe('admin impersonation', () => {
     expect(checkImpersonation({ handle: 'kauenet', displayName: 'Kaue | Superteam' }, admins).impersonator).toBe(false));
   it('does not flag an unrelated member', () =>
     expect(checkImpersonation({ handle: 'alice', displayName: 'Alice' }, admins).impersonator).toBe(false));
+});
+
+describe('welcome message', () => {
+  const cfg = { enabled: true, community: 'SuperteamBR', rulesUrl: 'https://x.com/rules', message: 'Hi {name}, welcome to {community}! Rules: {rules}' };
+  it('renders placeholders', () =>
+    expect(renderWelcome({ displayName: 'Alice' }, cfg)).toBe('Hi Alice, welcome to SuperteamBR! Rules: https://x.com/rules'));
+  it('returns undefined when disabled', () =>
+    expect(renderWelcome({ displayName: 'A' }, { ...cfg, enabled: false })).toBeUndefined());
+  it('strips URLs from a malicious display name', () =>
+    expect(renderWelcome({ displayName: 'join http://scam.xyz now' }, cfg)).not.toContain('scam.xyz'));
+  it('falls back to a generic greeting with no name', () =>
+    expect(renderWelcome({}, cfg)).toContain('there'));
 });

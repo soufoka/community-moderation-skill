@@ -11,12 +11,19 @@ import { classifyMessage, routeToPersona, RouteConfig } from '../classify-and-ro
 import { InMemoryMemberStore, newMember } from '../member-store';
 import { RateLimiter, IdempotencyStore } from '../rate-limiter';
 import { checkImpersonation, ProtectedAdmin } from '../impersonation';
+import { renderWelcome, WelcomeConfig } from '../welcome';
 
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error('Set BOT_TOKEN in the environment (never hardcode it).');
 
 const OFFICIAL_DOMAINS = ['superteam.fun', 'earn.superteam.fun'];
 const PROTECTED_ADMINS: ProtectedAdmin[] = [{ handle: 'kauenet', displayName: 'Kaue' }]; // from foka-config.json -> impersonation.protectedAdmins
+const WELCOME: WelcomeConfig = {
+  enabled: true,
+  community: 'Superteam BR',
+  rulesUrl: 'https://superteam.fun',
+  message: 'Welcome to {community}, {name}! 👋 Please read the pinned rules: {rules}\n🔒 Never share your seed phrase — admins will never DM you first.',
+}; // from foka-config.json -> welcome
 const routeConfig: RouteConfig = {
   defaultPersona: 'triage',
   defaultChannel: '#support',
@@ -90,6 +97,17 @@ bot.on('message:text', async (ctx) => {
       const r = routeToPersona(c, routeConfig, { handle: ctx.from?.username ?? id, trustState: rec.trustState }, ctx.msg.text.slice(0, 140));
       console.log(r.handoff);
     }
+  }
+});
+
+// Welcome new members on join.
+bot.on('message:new_chat_members', async (ctx) => {
+  for (const m of ctx.message.new_chat_members) {
+    if (m.is_bot) continue;
+    const text = renderWelcome({ displayName: [m.first_name, m.last_name].filter(Boolean).join(' '), handle: m.username }, WELCOME);
+    if (text) await ctx.reply(text).catch(() => {});
+    const mid = String(m.id);
+    if (!(await members.get(mid))) await members.upsert(newMember(mid, m.username ?? mid, 'telegram'));
   }
 });
 

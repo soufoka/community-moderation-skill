@@ -12,12 +12,19 @@ import { classifyMessage, routeToPersona, RouteConfig } from '../classify-and-ro
 import { InMemoryMemberStore, newMember } from '../member-store';
 import { RateLimiter, IdempotencyStore } from '../rate-limiter';
 import { checkImpersonation, ProtectedAdmin } from '../impersonation';
+import { renderWelcome, WelcomeConfig } from '../welcome';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('Set DISCORD_TOKEN in the environment (never hardcode it).');
 
 const OFFICIAL_DOMAINS = ['superteam.fun', 'earn.superteam.fun'];
 const PROTECTED_ADMINS: ProtectedAdmin[] = [{ handle: 'kauenet', displayName: 'Kaue' }]; // from foka-config.json -> impersonation.protectedAdmins
+const WELCOME: WelcomeConfig = {
+  enabled: true,
+  community: 'Superteam BR',
+  rulesUrl: 'https://superteam.fun',
+  message: 'Welcome to {community}, {name}! 👋 Please read the rules: {rules}\n🔒 Never share your seed phrase — admins will never DM you first.',
+}; // from foka-config.json -> welcome
 const routeConfig: RouteConfig = {
   defaultPersona: 'triage',
   defaultChannel: '#support',
@@ -29,7 +36,7 @@ const actions = new RateLimiter(20, 20);
 const seen = new IdempotencyStore();
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers],
 });
 
 client.on(Events.MessageCreate, async (message: Message) => {
@@ -91,6 +98,14 @@ client.on(Events.MessageCreate, async (message: Message) => {
       console.log(r.handoff);
     }
   }
+});
+
+// Welcome new members on join (requires the GuildMembers privileged intent).
+client.on(Events.GuildMemberAdd, async (member) => {
+  const text = renderWelcome({ displayName: member.displayName, handle: member.user.username }, WELCOME);
+  if (text && member.guild.systemChannel) await member.guild.systemChannel.send(text).catch(() => {});
+  const mid = member.id;
+  if (!(await members.get(mid))) await members.upsert(newMember(mid, member.user.username, 'discord'));
 });
 
 client.login(token);
