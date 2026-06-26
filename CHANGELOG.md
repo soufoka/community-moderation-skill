@@ -15,6 +15,7 @@ Initial release for the Superteam BR Solana AI Kit skills bounty.
 - Injection-safe gray-zone LLM adjudicator (injected judge; content passed as data).
 - Cross-skill composition (`birdeye`/`helius`/`wallet-analysis`) for on-chain honeypot signals.
 - Deploy utilities: `MemberStore`, token-bucket `RateLimiter`, `IdempotencyStore`.
+- Contact management: member contact records with a trust lifecycle (`maybePromote`, `vouch`), reputation (`adjustReputation`), relationship tags + lookup (`addTag`/`findByTag`/`findByRole`), and per-contact history (interactions, linked tickets, notes). See `resources/contact-management.md`.
 - Reference Telegram (grammY) and Discord (discord.js) bots and an MCP server.
 - Security model (prompt-injection, ReDoS, abuse/brigading, privacy, secrets), regression corpus, and CI.
 

@@ -6,15 +6,22 @@ Minimal schemas the agent reads/writes. Shown as TypeScript interfaces; persist 
 
 ```ts
 interface MemberRecord {
-  id: string;                 // platform user id (telegram/discord)
+  id: string;                 // platform user id (telegram/discord) — the stable key
   handle: string;             // @username (may change — id is the key)
   platform: 'telegram' | 'discord';
-  joinedAt: string;           // ISO timestamp
+  joinedAt: string;           // ISO — first seen
+  lastSeenAt: string;         // ISO — last activity
   trustState: 'NEW' | 'MEMBER' | 'TRUSTED' | 'FLAGGED' | 'MUTED' | 'BANNED';
   roles: string[];            // e.g. ['mod', 'contributor']
+  tags: string[];             // relationship/segments: 'vip', 'partner', 'press'
   reputation: number;         // signed score; rises with helpfulness, falls with violations
   messageCount: number;
+  interactions: number;       // support/mod touchpoints
   warnings: Warning[];
+  ticketIds: string[];        // linked SupportTicket ids
+  language?: string;          // detected/declared, e.g. 'pt'
+  links?: Record<string, string>; // e.g. { x: '@handle' }
+  vouchedBy?: string;         // handle of a TRUSTED voucher
   mutedUntil?: string;        // ISO, if MUTED
   notes?: string;             // freeform mod notes
 }

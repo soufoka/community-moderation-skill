@@ -83,9 +83,13 @@ Transitions are driven by signals and time. Full transition rules and thresholds
 
 Maintain one `MemberRecord` per member (schema in [`resources/data-schemas.md`](resources/data-schemas.md)):
 - Track `trustState`, `roles`, `reputation`, `warnings[]`, freeform `notes`.
-- **Onboarding:** greet `NEW` members, post rules, promote to `MEMBER` after the configured threshold (messages + age + no violations).
-- **Vouching:** a `TRUSTED` member can vouch a `NEW` member to `MEMBER`.
-- Reputation rises with helpful answers (peer reactions, resolved tickets) and falls with violations.
+- **Onboarding & promotion:** greet `NEW` members, post rules; `maybePromote()` auto-lifts `NEW → MEMBER` after thresholds (messages + age + no violations).
+- **Vouching:** a `TRUSTED` member can `vouch()` a `NEW` member straight to `MEMBER`.
+- **Reputation:** `adjustReputation()` rises with helpful answers (resolved tickets, peer reactions) and falls with violations; drives trust over time.
+- **Segmentation:** tag contacts (`vip`, `partner`, `contributor`, `press`) and look them up by tag/role for targeted handling.
+- **History:** track `interactions`, linked support `ticketIds`, and freeform notes per member.
+
+Full contact model + lifecycle: [`resources/contact-management.md`](resources/contact-management.md). Helpers + store live in [`examples/member-store.ts`](examples/member-store.ts).
 
 ## Pillar 3 — Support tagging
 

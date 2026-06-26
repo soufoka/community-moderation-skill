@@ -3,7 +3,7 @@ import { normalizeForMatch, scanUrls, scanWithUnshorten } from '../examples/norm
 import { moderateMessage } from '../examples/moderate-message';
 import { classifyMessage } from '../examples/classify-and-route';
 import { adjudicate, inGrayZone } from '../examples/llm-adjudicator';
-import { InMemoryMemberStore, newMember } from '../examples/member-store';
+import { InMemoryMemberStore, newMember, adjustReputation, vouch, maybePromote } from '../examples/member-store';
 import { RateLimiter, IdempotencyStore } from '../examples/rate-limiter';
 import { assessToken, extractMints } from '../examples/enrich-token';
 
@@ -137,5 +137,41 @@ describe('cross-skill enrichment', () => {
     const r = await assessToken('x', async () => ({ liquidityUsd: 100, ageMinutes: 5, mintAuthorityActive: true, holders: 4 }));
     expect(r.scam).toBe(true);
     expect(r.reasons.length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe('contact management', () => {
+  it('reputation adjusts up and down', () => {
+    const m = newMember('u', 'h', 'telegram');
+    expect(adjustReputation(m, 5).reputation).toBe(5);
+    expect(adjustReputation(m, -2).reputation).toBe(3);
+  });
+  it('vouch promotes NEW to MEMBER', () => {
+    const m = vouch(newMember('u', 'h', 'telegram'), 'modA');
+    expect(m.trustState).toBe('MEMBER');
+    expect(m.vouchedBy).toBe('modA');
+  });
+  it('maybePromote lifts an active, aged, clean NEW member', () => {
+    const m = newMember('u', 'h', 'telegram');
+    m.joinedAt = new Date(Date.now() - 5 * 86_400_000).toISOString();
+    m.messageCount = 10;
+    expect(maybePromote(m).trustState).toBe('MEMBER');
+  });
+  it('maybePromote keeps a brand-new member as NEW', () => {
+    const m = newMember('u', 'h', 'telegram');
+    m.messageCount = 10;
+    expect(maybePromote(m).trustState).toBe('NEW');
+  });
+  it('tags, lookup, interactions and notes', async () => {
+    const store = new InMemoryMemberStore();
+    await store.upsert(newMember('u1', 'a', 'discord'));
+    await store.addTag('u1', 'vip');
+    await store.recordInteraction('u1');
+    await store.note('u1', 'asked about payout');
+    const m = await store.get('u1');
+    expect(m?.tags).toContain('vip');
+    expect(m?.interactions).toBe(1);
+    expect((await store.findByTag('vip')).length).toBe(1);
+    expect(m?.notes).toContain('payout');
   });
 });
