@@ -1,5 +1,5 @@
 /**
- * Evasion-resistant, multilingual (EN + PT + ES) moderation scorer + action decision.
+ * Evasion-resistant, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH) moderation scorer + action decision.
  * Pure, dependency-free. All keyword matching runs on the normalized skeleton
  * (see normalize.ts), so homoglyph / zero-width / leet / accent evasions are
  * already defeated. No `.*` regexes — matching is linear (ReDoS-safe).
@@ -49,22 +49,27 @@ const PATTERNS: Pattern[] = [
       'frase de recuperacao', 'frase semente', 'chave secreta', 'palavras de recuperacao',
       'validar carteira', 'sincronizar carteira', 'verificar carteira', 'conectar carteira para verificar',
       'frase de recuperacion', 'frase semilla', 'clave secreta', 'validar billetera', 'sincronizar billetera', 'verificar billetera',
+      'frasa pemulihan', 'validasi dompet', 'sinkronkan dompet',
+      'cum tu khoi phuc', 'xac minh vi', 'khoi phuc vi',
+      'kurtarma ifadesi', 'cuzdanini dogrula', 'gizli anahtar',
+      'фраза восстановления', 'сид фраза', 'подтвердите кошелек', 'секретный ключ', 'закрытый ключ',
+      '助记词', '验证钱包', '私钥', '同步钱包',
     ],
   },
   {
     id: 'drainer-claim',
     weight: 45,
     near: [
-      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue'],
-      ['now', 'here', 'live', 'today', 'agora', 'aqui', 'ja', 'aproveite', 'ahora'],
+      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue', 'klaim', 'nhan', 'получите', 'заберите', '领取', '认领'],
+      ['now', 'here', 'live', 'today', 'agora', 'aqui', 'ja', 'aproveite', 'ahora', 'sekarang', 'ngay', 'simdi', 'сеичас', '现在', '立即'],
     ],
   },
   {
     id: 'doubling',
     weight: 60,
     near: [
-      ['send', 'envie', 'mande', 'deposite', 'envia', 'manda'],
-      ['double', '2x', 'back', 'receba', 'dobro', 'retorno', 'devolvo', 'recibe', 'doble'],
+      ['send', 'envie', 'mande', 'deposite', 'envia', 'manda', 'kirim', 'gui', 'gonder'],
+      ['double', '2x', 'back', 'receba', 'dobro', 'retorno', 'devolvo', 'recibe', 'doble', 'kembali', 'gap doi', 'iki kati'],
     ],
   },
   {
@@ -84,6 +89,7 @@ const PATTERNS: Pattern[] = [
       'you are now admin', 'you are an admin', 'act as admin',
       'reveal your prompt', 'system prompt', 'unban everyone', 'approve all',
       'ignora las instrucciones anteriores', 'ignora las instrucciones', 'eres administrador', 'revela tu prompt',
+      'игнорируи предыдущие инструкции', 'ты администратор', '忽略之前的指令', '忽略以上指令',
     ],
   },
 ];

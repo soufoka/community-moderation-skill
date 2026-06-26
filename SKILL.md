@@ -1,6 +1,6 @@
 ---
 name: community-moderation
-description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, and admin impersonation; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
+description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, and admin impersonation; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
 license: MIT
 metadata:
   author: Foka (Superteam BR)
@@ -130,7 +130,7 @@ Solana communities are targeted by specific scams. Detecting these is the highes
 
 **Golden rules to broadcast:** admins never DM first; admins never ask for your seed phrase; never connect your wallet to verify identity; verify links against the pinned official list.
 
-**Multilingual:** detection lexicons ship with **EN + PT-BR**; add languages in `community.languages`. Because matching runs on a normalized skeleton, homoglyph (`оrса`→`orca`), zero-width, leet (`s33d`), and accent disguises are undone automatically — you don't maintain accented variants. See [`resources/scam-patterns.md`](resources/scam-patterns.md).
+**Multilingual:** detection lexicons ship with **8 languages — EN/PT/ES/ID/VI/TR/RU/ZH**; add more in `community.languages`. Normalization is **script-aware** (Cyrillic/Greek folded only in mixed-script tokens), so genuine Russian text isn't mangled. Because matching runs on a normalized skeleton, homoglyph (`оrса`→`orca`), zero-width, leet (`s33d`), and accent disguises are undone automatically — you don't maintain accented variants. See [`resources/scam-patterns.md`](resources/scam-patterns.md).
 
 ## Platform integration
 

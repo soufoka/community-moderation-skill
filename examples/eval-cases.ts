@@ -53,4 +53,18 @@ export const EVAL_CASES: EvalCase[] = [
   { name: 'legit-thanks', text: 'thanks for the help, solved it!', trust: 'MEMBER', ageDays: 30, expectScam: false },
   { name: 'legit-mention', text: 'hey @mod can you check the pinned message?', trust: 'MEMBER', ageDays: 30, expectScam: false },
   { name: 'legit-empty', text: '', trust: 'MEMBER', ageDays: 30, expectScam: false },
+
+  // ---------- additional languages: ID / VI / TR / RU / ZH ----------
+  { name: 'id-seed-phish', text: 'dukungan resmi: validasi dompet anda sekarang', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'vi-seed-phish', text: 'xác minh ví của bạn ngay bây giờ', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'tr-seed-phish', text: 'cüzdanını doğrula ve kurtarma ifadesi gönder', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ru-seed-phish', text: 'поддержка: подтвердите кошелек, нужна фраза восстановления', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'zh-seed-phish', text: '官方支持：请验证钱包并发送助记词', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'id-drainer', text: 'klaim airdrop sekarang', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ru-drainer', text: 'заберите airdrop сейчас', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'id-wallet-legit', text: 'dompet saya tidak terhubung, tolong bantu', trust: 'MEMBER', ageDays: 40, expectScam: false, expectTag: 'wallet-help' },
+  { name: 'tr-wallet-legit', text: 'cüzdan baglanmiyor, yardim eder misiniz?', trust: 'MEMBER', ageDays: 40, expectScam: false, expectTag: 'wallet-help' },
+  { name: 'ru-payout-legit', text: 'мне не заплатили награду за баунти', trust: 'MEMBER', ageDays: 120, expectScam: false, expectTag: 'payout-issue' },
+  { name: 'zh-wallet-legit', text: '我的钱包连接不上', trust: 'MEMBER', ageDays: 60, expectScam: false, expectTag: 'wallet-help' },
+  { name: 'vi-tx-legit', text: 'giao dịch của tôi bị treo', trust: 'MEMBER', ageDays: 50, expectScam: false, expectTag: 'transaction-issue' },
 ];
