@@ -10,11 +10,13 @@ import { moderateMessage } from '../moderate-message';
 import { classifyMessage, routeToPersona, RouteConfig } from '../classify-and-route';
 import { InMemoryMemberStore, newMember } from '../member-store';
 import { RateLimiter, IdempotencyStore } from '../rate-limiter';
+import { checkImpersonation, ProtectedAdmin } from '../impersonation';
 
 const token = process.env.BOT_TOKEN;
 if (!token) throw new Error('Set BOT_TOKEN in the environment (never hardcode it).');
 
 const OFFICIAL_DOMAINS = ['superteam.fun', 'earn.superteam.fun'];
+const PROTECTED_ADMINS: ProtectedAdmin[] = [{ handle: 'kauenet', displayName: 'Kaue' }]; // from foka-config.json -> impersonation.protectedAdmins
 const routeConfig: RouteConfig = {
   defaultPersona: 'triage',
   defaultChannel: '#support',
@@ -31,6 +33,18 @@ bot.on('message:text', async (ctx) => {
   if (ctx.from?.is_bot) return; // self-guard: never act on other bots
   // idempotency — Telegram message_id is unique per CHAT, not globally, so scope by chat.
   if (!seen.firstSeen(`${ctx.chat?.id ?? ''}:${ctx.msg.message_id}`)) return;
+
+  // Block admin impersonators outright — they don't get to message.
+  const imp = checkImpersonation(
+    { handle: ctx.from?.username, displayName: [ctx.from?.first_name, ctx.from?.last_name].filter(Boolean).join(' ') },
+    PROTECTED_ADMINS,
+  );
+  if (imp.impersonator) {
+    await ctx.deleteMessage().catch(() => {});
+    await ctx.restrictChatMember(ctx.from!.id, { can_send_messages: false }).catch(() => {}); // can't send messages
+    console.log('IMPERSONATION — muted', { user: ctx.from?.username, matched: imp.matchedAdmin, reason: imp.reason });
+    return;
+  }
 
   const id = String(ctx.from!.id);
   let rec = await members.get(id);

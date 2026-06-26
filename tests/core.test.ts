@@ -6,6 +6,7 @@ import { adjudicate, inGrayZone } from '../examples/llm-adjudicator';
 import { InMemoryMemberStore, newMember, adjustReputation, vouch, maybePromote } from '../examples/member-store';
 import { RateLimiter, IdempotencyStore } from '../examples/rate-limiter';
 import { assessToken, extractMints } from '../examples/enrich-token';
+import { checkImpersonation } from '../examples/impersonation';
 
 describe('normalization (anti-evasion)', () => {
   it('folds homoglyphs', () => expect(normalizeForMatch('сlаiм')).toBe('claim'));
@@ -183,4 +184,18 @@ describe('contact management', () => {
     expect((await store.findByTag('vip')).length).toBe(1);
     expect(m?.notes).toContain('payout');
   });
+});
+
+describe('admin impersonation', () => {
+  const admins = [{ handle: 'kauenet', displayName: 'Kaue | Superteam' }];
+  it('flags a copied display name', () =>
+    expect(checkImpersonation({ handle: 'fake123', displayName: 'Kaue | Superteam' }, admins).impersonator).toBe(true));
+  it('flags the admin name embedded in a longer name', () =>
+    expect(checkImpersonation({ handle: 'fake123', displayName: 'Kaue | Superteam (support)' }, admins).reason).toBe('name-contains'));
+  it('flags a look-alike handle (Cyrillic homoglyph)', () =>
+    expect(checkImpersonation({ handle: 'kаuenet', displayName: 'x' }, admins).reason).toBe('lookalike-handle'));
+  it('does not flag the real admin', () =>
+    expect(checkImpersonation({ handle: 'kauenet', displayName: 'Kaue | Superteam' }, admins).impersonator).toBe(false));
+  it('does not flag an unrelated member', () =>
+    expect(checkImpersonation({ handle: 'alice', displayName: 'Alice' }, admins).impersonator).toBe(false));
 });

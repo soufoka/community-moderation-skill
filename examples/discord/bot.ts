@@ -11,11 +11,13 @@ import { moderateMessage } from '../moderate-message';
 import { classifyMessage, routeToPersona, RouteConfig } from '../classify-and-route';
 import { InMemoryMemberStore, newMember } from '../member-store';
 import { RateLimiter, IdempotencyStore } from '../rate-limiter';
+import { checkImpersonation, ProtectedAdmin } from '../impersonation';
 
 const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('Set DISCORD_TOKEN in the environment (never hardcode it).');
 
 const OFFICIAL_DOMAINS = ['superteam.fun', 'earn.superteam.fun'];
+const PROTECTED_ADMINS: ProtectedAdmin[] = [{ handle: 'kauenet', displayName: 'Kaue' }]; // from foka-config.json -> impersonation.protectedAdmins
 const routeConfig: RouteConfig = {
   defaultPersona: 'triage',
   defaultChannel: '#support',
@@ -33,6 +35,18 @@ const client = new Client({
 client.on(Events.MessageCreate, async (message: Message) => {
   if (message.author.bot) return; // self-guard
   if (!seen.firstSeen(message.id)) return; // idempotency
+
+  // Block admin impersonators outright — they don't get to message.
+  const imp = checkImpersonation(
+    { handle: message.author.username, displayName: message.member?.displayName ?? message.author.username },
+    PROTECTED_ADMINS,
+  );
+  if (imp.impersonator) {
+    await message.delete().catch(() => {});
+    await message.member?.timeout(24 * 60 * 60_000, `impersonating ${imp.matchedAdmin}`).catch(() => {});
+    console.log('IMPERSONATION — muted', { user: message.author.username, matched: imp.matchedAdmin, reason: imp.reason });
+    return;
+  }
 
   const id = message.author.id;
   let rec = await members.get(id);

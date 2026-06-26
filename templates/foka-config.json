@@ -9,6 +9,12 @@
     "pinnedRulesUrl": "REPLACE_ME",
     "languages": ["en", "pt"]
   },
+  "impersonation": {
+    "protectedAdmins": [
+      { "handle": "REPLACE_ME_admin", "displayName": "REPLACE_ME Admin Full Name" }
+    ],
+    "_note": "Real admins/staff (FULL distinctive display names + handles). A non-admin who copies one of these names, or uses a look-alike handle, is muted (can't message) and escalated. Use the full distinctive name to avoid false positives on common first names."
+  },
   "trust": {
     "promoteAfterMessages": 5,
     "promoteAfterDays": 2,
