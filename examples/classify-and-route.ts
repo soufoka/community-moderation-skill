@@ -45,8 +45,13 @@ const RULES: { tag: SupportTag; priority: Priority; any: string[] }[] = [
 
 export function classifyMessage(text: string): Classification {
   const s = normalizeForMatch(text);
+  const words = s.split(' ');
+  // Pure-ASCII single tokens match on word-PREFIX (kills mid-word false positives like
+  // "api" in "capital" or "sign" in "design"). Phrases and non-Latin keywords
+  // (CJK/Cyrillic, which carry no ASCII word boundaries) still match as substrings.
+  const has = (k: string) => (/^[a-z0-9]+$/.test(k) ? words.some((w) => w.startsWith(k)) : s.includes(k));
   for (const r of RULES) {
-    if (r.any.some((k) => s.includes(k))) return { tag: r.tag, priority: r.priority };
+    if (r.any.some(has)) return { tag: r.tag, priority: r.priority };
   }
   return { tag: 'off-topic', priority: 'P4' };
 }

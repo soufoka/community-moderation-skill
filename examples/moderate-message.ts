@@ -60,7 +60,7 @@ const PATTERNS: Pattern[] = [
     id: 'drainer-claim',
     weight: 45,
     near: [
-      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue', 'klaim', 'nhan', 'получите', 'заберите', '领取', '认领'],
+      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue', 'klaim', 'получите', 'заберите', '领取', '认领'],
       ['now', 'here', 'live', 'today', 'agora', 'aqui', 'ja', 'aproveite', 'ahora', 'sekarang', 'ngay', 'simdi', 'сеичас', '现在', '立即'],
     ],
   },

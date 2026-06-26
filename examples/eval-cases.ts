@@ -67,4 +67,9 @@ export const EVAL_CASES: EvalCase[] = [
   { name: 'ru-payout-legit', text: 'мне не заплатили награду за баунти', trust: 'MEMBER', ageDays: 120, expectScam: false, expectTag: 'payout-issue' },
   { name: 'zh-wallet-legit', text: '我的钱包连接不上', trust: 'MEMBER', ageDays: 60, expectScam: false, expectTag: 'wallet-help' },
   { name: 'vi-tx-legit', text: 'giao dịch của tôi bị treo', trust: 'MEMBER', ageDays: 50, expectScam: false, expectTag: 'transaction-issue' },
+
+  // ---------- precision regressions (substring/word-boundary false positives) ----------
+  { name: 'fp-protocol', text: 'how does the protocol work?', trust: 'MEMBER', ageDays: 30, expectScam: false, expectTag: 'off-topic' },
+  { name: 'fp-design', text: 'the design looks great', trust: 'MEMBER', ageDays: 30, expectScam: false, expectTag: 'off-topic' },
+  { name: 'fp-vi-received', text: 'tôi nhận được ngay rồi', trust: 'MEMBER', ageDays: 30, expectScam: false },
 ];

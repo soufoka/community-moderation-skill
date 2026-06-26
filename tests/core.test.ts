@@ -72,6 +72,8 @@ describe('classification (EN/PT/ES)', () => {
   it('payout PT', () => expect(classifyMessage('nao recebi meu pagamento ainda').tag).toBe('payout-issue'));
   it('payout ES', () => expect(classifyMessage('no me pagaron mi recompensa').tag).toBe('payout-issue'));
   it('wallet ES', () => expect(classifyMessage('mi billetera no conecta').tag).toBe('wallet-help'));
+  it('no mid-word FP: confirmation is not a transaction', () => expect(classifyMessage('can i get a confirmation please').tag).toBe('off-topic'));
+  it('no mid-word FP: capital is not technical-dev', () => expect(classifyMessage('how much capital do i need').tag).toBe('off-topic'));
 });
 
 describe('LLM adjudicator (injection-safe)', () => {
