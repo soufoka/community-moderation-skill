@@ -17,6 +17,7 @@ describe('normalization (anti-evasion)', () => {
     expect(moderateMessage({ text: 'a'.repeat(50000), memberTrust: 'MEMBER', accountAgeDays: 30 }).action).toBe('allow'));
   it('preserves genuine Cyrillic (Russian)', () => expect(normalizeForMatch('кошелек')).toBe('кошелек'));
   it('folds Greek homoglyphs in mixed tokens', () => expect(normalizeForMatch('clαim')).toBe('claim'));
+  it('folds extended homoglyphs (Greek β/ω, Cyrillic ӏ)', () => expect(normalizeForMatch('βank ӏink ωallet')).toBe('bank link wallet'));
   it('preserves Korean (Hangul survives NFKD->NFC)', () => expect(normalizeForMatch('지갑')).toBe('지갑'));
   it('preserves Japanese (kana/kanji)', () => expect(normalizeForMatch('ウォレット')).toBe('ウォレット'));
 });
