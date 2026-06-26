@@ -72,4 +72,14 @@ export const EVAL_CASES: EvalCase[] = [
   { name: 'fp-protocol', text: 'how does the protocol work?', trust: 'MEMBER', ageDays: 30, expectScam: false, expectTag: 'off-topic' },
   { name: 'fp-design', text: 'the design looks great', trust: 'MEMBER', ageDays: 30, expectScam: false, expectTag: 'off-topic' },
   { name: 'fp-vi-received', text: 'tôi nhận được ngay rồi', trust: 'MEMBER', ageDays: 30, expectScam: false },
+
+  // ---------- East Asian: KO / JA ----------
+  { name: 'ko-seed-phish', text: '공식 지원: 지갑 인증하고 복구 문구 보내세요', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ja-seed-phish', text: '公式サポート：ウォレット認証してシードフレーズを送信', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ko-drainer', text: '에어드랍 지금 받으세요', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ja-drainer', text: 'エアドロップ今すぐ請求', trust: 'NEW', ageDays: 0, expectScam: true },
+  { name: 'ko-wallet-legit', text: '제 지갑이 연결이 안돼요', trust: 'MEMBER', ageDays: 40, expectScam: false, expectTag: 'wallet-help' },
+  { name: 'ja-wallet-legit', text: 'ウォレットが繋がらない、助けて', trust: 'MEMBER', ageDays: 40, expectScam: false, expectTag: 'wallet-help' },
+  { name: 'ko-payout-legit', text: '바운티 보상을 아직 못 받았어요', trust: 'MEMBER', ageDays: 120, expectScam: false, expectTag: 'payout-issue' },
+  { name: 'ja-payout-legit', text: '報酬がまだ支払われていません', trust: 'MEMBER', ageDays: 120, expectScam: false, expectTag: 'payout-issue' },
 ];

@@ -1,6 +1,6 @@
 # Foka AI — Community Moderation Skill
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg) ![Lang](https://img.shields.io/badge/8%20languages-EN%2FPT%2FES%2FID%2FVI%2FTR%2FRU%2FZH-orange.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg) ![Lang](https://img.shields.io/badge/10%20languages-EN%2FPT%2FES%2FID%2FVI%2FTR%2FRU%2FZH%2FKO%2FJA-orange.svg)
 
 **The only community-safety skill in the bounty.** Every Solana project, DAO, and launch runs a Telegram/Discord — and loses users and trust to wallet drainers, seed-phrase phishing, and admin impersonation **every day**. Foka AI is an agent skill that keeps a community **safe** and **answered**: it moderates scams, manages member contacts, triages support, and routes questions to the right person — **safe by design**, with humans gating anything irreversible.
 
@@ -8,12 +8,12 @@
 
 ## Why this matters
 
-Most Solana tooling protects the *chain*. Almost nothing protects the *community channel*, where the actual phishing happens. Foka AI fills that gap with a deterministic, auditable, **evasion-resistant** core in **8 languages** (EN/PT/ES/ID/VI/TR/RU/ZH), plus reference Telegram/Discord bots and an MCP server so an agent (Claude, Cursor, …) can use it directly.
+Most Solana tooling protects the *chain*. Almost nothing protects the *community channel*, where the actual phishing happens. Foka AI fills that gap with a deterministic, auditable, **evasion-resistant** core in **10 languages** (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA), plus reference Telegram/Discord bots and an MCP server so an agent (Claude, Cursor, …) can use it directly.
 
 ## Features
 
 - **Evasion-resistant detection** — folds homoglyphs (`оrса`→`orca`), zero-width/bidi chars, leetspeak (`s33d`), and accents before matching, so disguises don't slip through.
-- **Multilingual (8 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH, with **script-aware** normalization so genuine Cyrillic (Russian) isn't mangled by the homoglyph defense.
+- **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip.
 - **URL defense** — punycode, raw-IP, deep-subdomain, **brand-impersonation** (`superteam.gift`), blocklist, and a shortener-unshorten hook.
 - **Solana scam catalog** — drainers, seed-phrase phishing, admin impersonation, fake giveaways, honeypots — extensible and versioned.
 - **Support triage + routing** — 11-tag taxonomy with P1–P4 SLAs and persona/channel routing.

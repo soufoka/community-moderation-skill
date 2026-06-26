@@ -32,11 +32,11 @@ export interface Routing extends Classification {
 
 // Order matters: higher-priority / more-specific rules first.
 const RULES: { tag: SupportTag; priority: Priority; any: string[] }[] = [
-  { tag: 'payout-issue', priority: 'P1', any: ['payout', 'not paid', 'didnt get paid', 'reward not', 'payment not', 'nao recebi', 'pagamento', 'recompensa nao', 'nao fui pago', 'no me pagaron', 'no he recibido', 'no pagaron', 'belum dibayar', 'odeme alamadim', 'chua nhan', 'не заплатили', '没有收到', '未支付'] },
+  { tag: 'payout-issue', priority: 'P1', any: ['payout', 'not paid', 'didnt get paid', 'reward not', 'payment not', 'nao recebi', 'pagamento', 'recompensa nao', 'nao fui pago', 'no me pagaron', 'no he recibido', 'no pagaron', 'belum dibayar', 'odeme alamadim', 'chua nhan', 'не заплатили', '没有收到', '未支付', '못 받았', '支払われ'] },
   { tag: 'submission-help', priority: 'P2', any: ['submit', 'submission', 'how to enter', 'how do i apply', 'deadline', 'enviar submissao', 'como participar', 'como envio', 'prazo', 'como participo', 'como me inscribo', 'fecha limite'] },
   { tag: 'bounty-question', priority: 'P2', any: ['bounty', 'listing', 'prize', 'eligib', 'premio', 'elegiv', 'recompensa', 'elegible'] },
-  { tag: 'transaction-issue', priority: 'P2', any: ['transaction', 'tx', 'failed', 'stuck', 'pending', 'signature', 'transacao', 'falhou', 'travada', 'pendente', 'assinatura', 'transaccion', 'pendiente', 'firma', 'fallo', 'transaksi', 'islem', 'giao dich', 'транзакция', '交易'] },
-  { tag: 'wallet-help', priority: 'P2', any: ['wallet', 'phantom', 'solflare', 'connect', 'sign', 'carteira', 'conectar', 'assinar', 'billetera', 'firmar', 'dompet', 'cuzdan', 'ket noi vi', 'кошелек', '钱包'] },
+  { tag: 'transaction-issue', priority: 'P2', any: ['transaction', 'tx', 'failed', 'stuck', 'pending', 'signature', 'transacao', 'falhou', 'travada', 'pendente', 'assinatura', 'transaccion', 'pendiente', 'firma', 'fallo', 'transaksi', 'islem', 'giao dich', 'транзакция', '交易', '거래', '取引'] },
+  { tag: 'wallet-help', priority: 'P2', any: ['wallet', 'phantom', 'solflare', 'connect', 'sign', 'carteira', 'conectar', 'assinar', 'billetera', 'firmar', 'dompet', 'cuzdan', 'ket noi vi', 'кошелек', '钱包', '지갑', 'ウォレット'] },
   { tag: 'bug-report', priority: 'P3', any: ['bug', 'broken', 'error', 'crash', 'not working', 'erro', 'quebrado', 'nao funciona', 'travou', 'no funciona', 'roto'] },
   { tag: 'technical-dev', priority: 'P3', any: ['api', 'sdk', 'rpc', 'anchor', 'program', 'deploy', 'integrat', 'programa', 'integrac'] },
   { tag: 'partnership', priority: 'P3', any: ['partner', 'collab', 'sponsor', 'integration request', 'parceria', 'patrocin', 'colaborac', 'asociacion'] },

@@ -54,14 +54,16 @@ const PATTERNS: Pattern[] = [
       'kurtarma ifadesi', 'cuzdanini dogrula', 'gizli anahtar',
       'фраза восстановления', 'сид фраза', 'подтвердите кошелек', 'секретный ключ', 'закрытый ключ',
       '助记词', '验证钱包', '私钥', '同步钱包',
+      '시드 문구', '복구 문구', '지갑 인증', '니모닉', '개인 키',
+      'シードフレーズ', 'リカバリーフレーズ', 'ウォレット認証', '秘密鍵', 'ニーモニック',
     ],
   },
   {
     id: 'drainer-claim',
     weight: 45,
     near: [
-      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue', 'klaim', 'получите', 'заберите', '领取', '认领'],
-      ['now', 'here', 'live', 'today', 'agora', 'aqui', 'ja', 'aproveite', 'ahora', 'sekarang', 'ngay', 'simdi', 'сеичас', '现在', '立即'],
+      ['claim', 'mint', 'airdrop', 'reclame', 'resgate', 'reivindique', 'conecte', 'reclama', 'reclamar', 'consigue', 'klaim', 'получите', 'заберите', '领取', '认领', '에어드랍', '클레임', 'エアドロップ', '請求'],
+      ['now', 'here', 'live', 'today', 'agora', 'aqui', 'ja', 'aproveite', 'ahora', 'sekarang', 'ngay', 'simdi', 'сеичас', '现在', '立即', '지금', '즉시', '今すぐ'],
     ],
   },
   {

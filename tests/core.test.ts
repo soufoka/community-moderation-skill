@@ -17,6 +17,8 @@ describe('normalization (anti-evasion)', () => {
     expect(moderateMessage({ text: 'a'.repeat(50000), memberTrust: 'MEMBER', accountAgeDays: 30 }).action).toBe('allow'));
   it('preserves genuine Cyrillic (Russian)', () => expect(normalizeForMatch('кошелек')).toBe('кошелек'));
   it('folds Greek homoglyphs in mixed tokens', () => expect(normalizeForMatch('clαim')).toBe('claim'));
+  it('preserves Korean (Hangul survives NFKD->NFC)', () => expect(normalizeForMatch('지갑')).toBe('지갑'));
+  it('preserves Japanese (kana/kanji)', () => expect(normalizeForMatch('ウォレット')).toBe('ウォレット'));
 });
 
 describe('scam detection (EN/PT/ES)', () => {
@@ -38,6 +40,10 @@ describe('scam detection (EN/PT/ES)', () => {
     expect(moderateMessage({ text: 'xác minh ví của bạn ngay', memberTrust: 'NEW', accountAgeDays: 0 }).escalate).toBe(true));
   it('ZH seed-phrase escalates', () =>
     expect(moderateMessage({ text: '验证钱包 助记词', memberTrust: 'NEW', accountAgeDays: 0 }).escalate).toBe(true));
+  it('KO seed-phrase escalates', () =>
+    expect(moderateMessage({ text: '지갑 인증 복구 문구', memberTrust: 'NEW', accountAgeDays: 0 }).escalate).toBe(true));
+  it('JA seed-phrase escalates', () =>
+    expect(moderateMessage({ text: 'ウォレット認証 シードフレーズ', memberTrust: 'NEW', accountAgeDays: 0 }).escalate).toBe(true));
 });
 
 describe('URL defense', () => {
