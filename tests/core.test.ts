@@ -58,6 +58,15 @@ describe('URL defense', () => {
   it('flags bare homoglyph domain (no scheme)', () =>
     expect(scanUrls('join ѕupеrtеam.fun now', ['superteam.fun']).some((f) => f.suspicious)).toBe(true));
   it('does not flag a benign bare domain', () => expect(scanUrls('repo at github.com today').length).toBe(0));
+  it('whitelisted link is exempt even for a new member', () => {
+    const d = moderateMessage({ text: 'check the docs https://superteam.fun/guide', memberTrust: 'NEW', accountAgeDays: 0, officialDomains: ['superteam.fun'] });
+    expect(d.action).toBe('allow');
+    expect(d.escalate).toBe(false);
+  });
+  it('non-whitelisted link from a new member is still filtered', () => {
+    const d = moderateMessage({ text: 'check https://random-site.com', memberTrust: 'NEW', accountAgeDays: 0, officialDomains: ['superteam.fun'] });
+    expect(d.action).toBe('delete');
+  });
   it('unshorten catches lookalike', async () => {
     const r = await scanWithUnshorten('see https://bit.ly/x', ['superteam.fun'], [], async () => 'http://supеrtеam.fun');
     expect(r.some((f) => f.suspicious)).toBe(true);

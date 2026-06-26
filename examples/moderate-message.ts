@@ -117,8 +117,9 @@ export function moderateMessage(input: MessageInput): Decision {
   // Mentions/links read from RAW text (before confusable folding).
   const mentions = input.mentionCount ?? (text.match(/@\w+/g) || []).length;
   const urls = scanUrls(text, input.officialDomains ?? [], input.blocklistDomains ?? []);
-  const hasLink = urls.length > 0;
-  const suspiciousUrl = urls.some((u) => u.suspicious);
+  const links = urls.filter((u) => !u.allowlisted); // whitelisted (official) domains are exempt — never filtered
+  const hasLink = links.length > 0;
+  const suspiciousUrl = links.some((u) => u.suspicious);
   const repeated = input.repeatedCount ?? 0;
   const untrusted = input.memberTrust === 'NEW' || input.memberTrust === 'FLAGGED';
 

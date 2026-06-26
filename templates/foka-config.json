@@ -3,6 +3,9 @@
     "name": "REPLACE_ME Community",
     "platform": "telegram",
     "officialDomains": ["superteam.fun", "earn.superteam.fun"],
+    "_note_officialDomains": "Your link WHITELIST — links to these domains (and subdomains) are never flagged or penalized, even from brand-new members. Add every site your community trusts.",
+    "blocklistDomains": [],
+    "_note_blocklistDomains": "Known-bad domains — any link to these is flagged immediately.",
     "pinnedRulesUrl": "REPLACE_ME",
     "languages": ["en", "pt"]
   },
