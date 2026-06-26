@@ -9,6 +9,7 @@ Initial release for the Superteam BR Solana AI Kit skills bounty.
 ### Added
 - Evasion-resistant normalization (homoglyph / zero-width / leet / accent folding) and URL defense (punycode, raw-IP, deep-subdomain, brand-impersonation, blocklist, shortener-unshorten hook).
 - Multilingual scam lexicon and support taxonomy in **10 languages** (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA), with script-aware normalization (Cyrillic/Greek folded only in mixed-script tokens so genuine Russian/Greek is preserved; Hangul/kana survive an NFKD→NFC round-trip).
+- Optional `confusables-pro` module — full Unicode (TR39) homoglyph coverage via the `confusables` lib, injected behind the same mixed-script gating so the detection core stays dependency-free.
 - Deterministic moderation scorer with a member trust-state machine, signal→action matrix, escalation ladder, and raid protocol.
 - Support triage (11 tags, P1–P4 SLAs) and persona/channel routing.
 - Injection-safe gray-zone LLM adjudicator (injected judge; content passed as data).

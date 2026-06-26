@@ -13,7 +13,7 @@ Most Solana tooling protects the *chain*. Almost nothing protects the *community
 ## Features
 
 - **Evasion-resistant detection** — folds homoglyphs (`оrса`→`orca`), zero-width/bidi chars, leetspeak (`s33d`), and accents before matching, so disguises don't slip through.
-- **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip.
+- **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip. Opt-in [`confusables-pro`](examples/confusables-pro.ts) swaps in the complete Unicode (TR39) table.
 - **URL defense** — punycode, raw-IP, deep-subdomain, **brand-impersonation** (`superteam.gift`), blocklist, and a shortener-unshorten hook.
 - **Solana scam catalog** — drainers, seed-phrase phishing, admin impersonation, fake giveaways, honeypots — extensible and versioned.
 - **Support triage + routing** — 11-tag taxonomy with P1–P4 SLAs and persona/channel routing.
@@ -58,7 +58,7 @@ message ──▶ normalize (anti-evasion) ──▶ score (multilingual lexicon
        delete/mute (always)            ban/kick → HUMAN              clean → classify + route
 ```
 
-The core (`examples/*.ts`) is **pure and dependency-free**; transports (grammY/discord.js) and the MCP server are thin adapters. See [SKILL.md](SKILL.md) for the full agent instructions.
+The detection core (normalize / moderate / classify) is **pure and dependency-free**; the optional [`confusables-pro`](examples/confusables-pro.ts) module adds full TR39 homoglyph coverage via the `confusables` lib, and transports (grammY/discord.js) + the MCP server are thin adapters. See [SKILL.md](SKILL.md) for the full agent instructions.
 
 ## Security
 
