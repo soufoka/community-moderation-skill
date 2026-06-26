@@ -10,6 +10,16 @@
 
 Most Solana tooling protects the *chain*. Almost nothing protects the *community channel*, where the actual phishing happens. Foka AI fills that gap with a deterministic, auditable, **evasion-resistant** core in **10 languages** (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA), plus reference Telegram/Discord bots and an MCP server so an agent (Claude, Cursor, …) can use it directly.
 
+## How it works (in plain English)
+
+Foka AI is a tireless helper that reads every message in your group and asks two things: **is this a scam?** and **does this person need help?**
+
+- **Catching scams.** Scammers disguise their words — swapping letters for look-alikes (a Cyrillic `а` for `a`), sneaking in invisible characters, or writing in other languages. Foka AI first *cleans* each message into a plain form, so `сlаiм` and `claim` look identical to it. Then it checks for the moves that actually drain Solana wallets — fake "verify your wallet" links, "send 1 SOL, get 2 back", people impersonating admins — in **10 languages**.
+- **Acting safely.** When it spots a scam it removes the message and quietly alerts the human moderators — but it **never bans anyone on its own**; a human always makes the serious calls. And it won't punish trusted mods (they're usually the ones *warning* about scams).
+- **Helping members.** For normal questions ("my wallet won't connect", "where's my payout?") it sorts them by topic and urgency and routes them to the right person.
+
+Open-source (MIT), with 108 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
+
 ## Features
 
 - **Evasion-resistant detection** — folds homoglyphs (`оrса`→`orca`), zero-width/bidi chars, leetspeak (`s33d`), and accents before matching, so disguises don't slip through.
