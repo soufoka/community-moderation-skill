@@ -209,6 +209,11 @@ describe('welcome message', () => {
     expect(renderWelcome({ displayName: 'A' }, { ...cfg, enabled: false })).toBeUndefined());
   it('strips URLs from a malicious display name', () =>
     expect(renderWelcome({ displayName: 'join http://scam.xyz now' }, cfg)).not.toContain('scam.xyz'));
+  it('neutralizes an @everyone/@here display name so the welcome cannot ping', () => {
+    expect(renderWelcome({ displayName: '@everyone' }, cfg)).not.toContain('@everyone');
+    expect(renderWelcome({ displayName: '@here folks' }, cfg)).not.toContain('@here');
+    expect(renderWelcome({ displayName: '@everyone' }, cfg)).toContain('everyone'); // still readable
+  });
   it('falls back to a generic greeting with no name', () =>
     expect(renderWelcome({}, cfg)).toContain('there'));
 });

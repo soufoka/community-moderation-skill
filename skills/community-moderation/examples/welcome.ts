@@ -15,6 +15,10 @@ function safeName(member: { displayName?: string; handle?: string }): string {
   const cleaned = raw
     .replace(/https?:\/\/\S+/gi, '')
     .replace(/\b(?:t\.me|discord\.gg|www\.)\/\S+/gi, '')
+    // Break mention triggers so an echoed name can't ping anyone: @everyone / @here on
+    // Discord, @username on Telegram. A zero-width space after @/# keeps the text readable
+    // but stops the platform from forming a real mention.
+    .replace(/([@#＠])/g, '$1​')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 40);

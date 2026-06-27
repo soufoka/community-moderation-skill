@@ -1,7 +1,7 @@
 {
   "name": "community-moderation-skill",
   "description": "Foka AI — moderate Solana community groups (Telegram/Discord) and run member support: detect spam, scam/drainer links, raids, and admin impersonation; manage members; triage and route support. Ships content filters, group analytics, a member roster, immunity roles, audit logging, and ticketing.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Foka (Superteam BR)",
     "url": "https://github.com/soufoka"

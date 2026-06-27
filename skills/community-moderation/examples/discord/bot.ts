@@ -64,6 +64,11 @@ const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildModeration, // for ban audit events
   ],
+  // SECURITY: the bot echoes member-controlled text (welcome names, audit nicknames,
+  // transcripts). A server-wide "parse nothing" default means no echoed @everyone/@here
+  // or role mention can ping — mentions still render, they just don't notify. Any
+  // intended ping would override this per-message.
+  allowedMentions: { parse: [] },
 });
 
 // Audit logging (MEE6 parity): events → the log channel. Sink is injected so gating/formatting

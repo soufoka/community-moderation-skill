@@ -2,6 +2,11 @@
 
 All notable changes to this skill are documented here.
 
+## [1.0.1] — 2026-06-27
+
+### Security (post-restructure bug hunt)
+- **Discord mention injection (@everyone cannon) fixed.** The bot echoes member-controlled text — welcome names and audit-log nicknames — to channels. A new member or nickname set to `@everyone`/`@here` could make the bot mass-ping the server (welcome via `systemChannel.send`) or the log channel (audit sink via `channel.send`), since neither suppressed mentions. Fixed at the right altitude: the Discord `Client` now defaults to `allowedMentions: { parse: [] }`, so no echoed mention from any bot message can notify — mentions still render, they just don't ping. Defense-in-depth: `examples/welcome.ts` `safeName()` now breaks `@`/`#` mention triggers with a zero-width space (covers Telegram `@username` too). Regression test added.
+
 ## [1.0.0] — 2026-06-27
 
 ### Changed (repackaged as a Claude Code plugin)
