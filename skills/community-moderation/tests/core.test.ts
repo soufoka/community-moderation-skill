@@ -101,6 +101,20 @@ describe('channel-wide ping (@everyone/@here/@all) from non-admins', () => {
     expect(ping('@allan can you help').reasons).not.toContain('mass-ping'); // @all is a prefix of @allan
   });
   it('a plain message is untouched', () => expect(ping('gm everyone, how do i submit?').reasons).not.toContain('mass-ping'));
+
+  // configurable token list (foka-config.json -> moderation.massPingTokens)
+  it('honors a custom token list', () => {
+    const cfg = (text: string) => moderateMessage({ text, memberTrust: 'MEMBER', accountAgeDays: 30, massPingTokens: ['staff', 'boss'] });
+    expect(cfg('@staff please look').reasons).toContain('mass-ping');
+    expect(cfg('@everyone hi').reasons).not.toContain('mass-ping'); // default token no longer in the list
+  });
+  it('an empty token list disables the check', () =>
+    expect(moderateMessage({ text: '@everyone hi', memberTrust: 'MEMBER', accountAgeDays: 30, massPingTokens: [] }).reasons).not.toContain('mass-ping'));
+  it('escapes regex metacharacters in tokens (no wildcard match)', () => {
+    const cfg = (text: string) => moderateMessage({ text, memberTrust: 'MEMBER', accountAgeDays: 30, massPingTokens: ['a.b'] });
+    expect(cfg('@axb here').reasons).not.toContain('mass-ping'); // the '.' is a literal, not a wildcard
+    expect(cfg('@a.b literally').reasons).toContain('mass-ping'); // the literal token still matches
+  });
 });
 
 describe('false positives stay calm', () => {

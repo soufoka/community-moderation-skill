@@ -26,6 +26,7 @@ const token = process.env.DISCORD_TOKEN;
 if (!token) throw new Error('Set DISCORD_TOKEN in the environment (never hardcode it).');
 
 const OFFICIAL_DOMAINS = ['superteam.fun', 'earn.superteam.fun'];
+const MASS_PING_TOKENS = ['everyone', 'here', 'all', 'channel', 'room', 'online', 'group', 'todos', 'all_members']; // from foka-config.json -> moderation.massPingTokens
 const PROTECTED_ADMINS: ProtectedAdmin[] = [{ handle: 'kauenet', displayName: 'Kaue' }]; // from foka-config.json -> impersonation.protectedAdmins
 const WELCOME: WelcomeConfig = {
   enabled: true,
@@ -183,6 +184,7 @@ client.on(Events.MessageCreate, async (message: Message) => {
     memberTrust: rec.trustState,
     accountAgeDays: ageDays,
     officialDomains: OFFICIAL_DOMAINS,
+    massPingTokens: MASS_PING_TOKENS,
   });
 
   // Immunity (MEE6 "Immunity Roles"): owner / admins / immune roles / bot masters are

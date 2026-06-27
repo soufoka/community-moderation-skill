@@ -2,6 +2,11 @@
 
 All notable changes to this skill are documented here.
 
+## [1.1.1] — 2026-06-27
+
+### Changed
+- **Channel-wide ping tokens are now configurable.** `foka-config.json` → `moderation.massPingTokens` (passed to the scorer as `input.massPingTokens`) lets a community add/remove the `@`-tokens that trip the `mass-ping` signal, with the built-in list as the default. Tokens are matched as **escaped literals** joined into one alternation — never user-supplied regex, so it stays ReDoS-safe — and an empty list disables the check. Wired into both reference bots (`MASS_PING_TOKENS`). 3 tests added (custom list, disable, metacharacter escaping).
+
 ## [1.1.0] — 2026-06-27
 
 ### Added

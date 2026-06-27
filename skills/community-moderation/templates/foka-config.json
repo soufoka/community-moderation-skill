@@ -50,7 +50,9 @@
       "validar carteira",
       "frase de recuperacao"
     ],
-    "_note_bannedSubstrings": "Matched as NORMALIZED substrings (examples/normalize.ts), never compiled as raw regex — avoids ReDoS."
+    "_note_bannedSubstrings": "Matched as NORMALIZED substrings (examples/normalize.ts), never compiled as raw regex — avoids ReDoS.",
+    "massPingTokens": ["everyone", "here", "all", "channel", "room", "online", "group", "todos", "all_members"],
+    "_note_massPingTokens": "Channel-wide @ping tokens blocked from NON-admins: a non-admin who posts @<token> (e.g. @everyone) has the message removed (mass-ping signal). Admins are exempt via immunity/trust. Matched as ESCAPED literals at a real mention position (so name@everyone.com and @allan are NOT flagged) — never compiled as a raw regex (ReDoS-safe). Edit to add/remove terms; set to [] to disable entirely."
   },
   "contentFilters": {
     "_note": "Combot 'Filters' parity — deterministic content-type filters applied by examples/content-filters.ts BEFORE the scam scorer. Each value is the action when a message carries that content type: allow | warn | delete | mute | kick | ban (or 'off' = disabled = allow). Order mirrors the Combot panel. NEW/FLAGGED members are additionally restricted by trust.newMemberNoLinks / newMemberNoMedia even when a filter says 'allow'.",
