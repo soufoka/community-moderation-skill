@@ -2,6 +2,11 @@
 
 All notable changes to this skill are documented here.
 
+## [1.1.0] — 2026-06-27
+
+### Added
+- **Channel-wide ping protection (`@everyone` / `@here` / `@all`).** A non-admin who posts `@everyone`, `@here`, `@all` (also `@channel`/`@room`/`@online`/`@group`/`@todos`) now trips a `mass-ping` signal in the scorer → the message is removed (and combined with links/scam it climbs to mute + escalate). Previously only **≥5** individual `@`-mentions tripped the mass-mention signal, so a lone `@everyone` — which pings the whole server — slipped through scoring `0`. Detected on raw text at a real mention position, so `name@everyone.com` and `@allan` are **not** flagged; admins are exempt at the bot layer (immune / `TRUSTED` are escalated, not auto-actioned). 6 regression tests added (`examples/moderate-message.ts`).
+
 ## [1.0.1] — 2026-06-27
 
 ### Security (post-restructure bug hunt)

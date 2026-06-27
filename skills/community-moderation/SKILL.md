@@ -65,6 +65,7 @@ Transitions are driven by signals and time. Full transition rules and thresholds
 | Flood / repeated identical posts | Low | Rate-limit + soft warn |
 | External link from `NEW`/`FLAGGED` member | Medium | Delete + warn |
 | Mass @-mentions / unsolicited promo | Medium | Delete + flag |
+| Channel-wide ping (`@everyone`/`@here`/`@all`) from a non-admin | Medium | Delete (admins exempt via immunity/trust) |
 | Known Solana scam pattern (drainer, seed-phrase phish) | High | Delete + mute + escalate |
 | Admin impersonation | High | Ban + report (high confidence) |
 | Join spike (raid) | High | Lockdown protocol |

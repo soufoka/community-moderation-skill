@@ -96,6 +96,13 @@ const PATTERNS: Pattern[] = [
   },
 ];
 
+// Channel-wide ping tokens (@everyone/@here/@all/…) that notify a whole server/group.
+// Only admins should use these — a non-admin who does is spamming. Matched on RAW text
+// (the platform only pings on the literal ASCII token; a homoglyph @everyоne can't ping,
+// so it's just text). The `@` must sit at a mention position (start or after a non-word
+// char) so an address like `name@everyone.com` isn't flagged.
+const MASS_PING_RE = /(?:^|[^\w@])@(everyone|here|all|channel|room|online|group|todos|all_members)\b/i;
+
 function nearMatch(s: string, a: string[], b: string[], window = 40): boolean {
   for (const x of a) {
     const i = s.indexOf(x);
@@ -139,6 +146,10 @@ export function moderateMessage(input: MessageInput): Decision {
   if (hasLink && untrusted) { score += 30; reasons.push('link-from-untrusted'); }
   if (input.accountAgeDays < 1 && hasLink) { score += 15; reasons.push('fresh-account-link'); }
   if (mentions >= 5) { score += 20; reasons.push('mass-mentions'); }
+  // Channel-wide @everyone/@here/@all from a non-admin → remove it. Admins are exempt at
+  // the bot layer (immune / TRUSTED are escalated, not auto-actioned); a lone token scores
+  // to `delete`, and combined with links/scam it climbs toward mute + escalate.
+  if (MASS_PING_RE.test(text)) { score += 45; reasons.push('mass-ping'); }
   if (repeated >= 3) { score += 20; reasons.push('flood'); }
 
   const external = Boolean(input.externalSignals?.tokenScam || input.externalSignals?.addressScam);

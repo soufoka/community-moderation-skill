@@ -1,6 +1,6 @@
 {
   "name": "community-moderation-skill",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "license": "MIT",
   "description": "Foka AI — evasion-resistant, multilingual community moderation & member-support skill (plugin) for Solana Telegram/Discord communities: anti-scam moderation, content filters, analytics, immunity, audit logging, and ticketing.",
   "type": "module",

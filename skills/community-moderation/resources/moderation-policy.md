@@ -23,6 +23,7 @@ The full decision logic behind the summary in `SKILL.md`. All thresholds are def
 | Off-topic promo / unsolicited ad | Low–Med | delete → flag | Auto |
 | External link from `NEW`/`FLAGGED` | Medium | delete → warn | Auto |
 | Mass @-mentions (≥5) | Medium | delete → flag | Auto |
+| Channel-wide ping `@everyone`/`@here`/`@all` from a non-admin | Medium | delete → flag | Auto (admins exempt via immunity/trust) |
 | Profanity / harassment | Medium | delete → warn → mute | Auto (mute), human (repeat) |
 | Known scam pattern (drainer/phish) | High | delete → mute → escalate | Auto delete/mute, **human/known-pattern for ban** |
 | Admin impersonation | High | ban → report | **Human-confirm unless high-confidence pattern** |

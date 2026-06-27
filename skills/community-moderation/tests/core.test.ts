@@ -75,6 +75,34 @@ describe('URL defense', () => {
   });
 });
 
+describe('channel-wide ping (@everyone/@here/@all) from non-admins', () => {
+  const ping = (text: string) => moderateMessage({ text, memberTrust: 'MEMBER', accountAgeDays: 30 });
+  it('@everyone is removed', () => {
+    const d = ping('hey @everyone check this out');
+    expect(d.reasons).toContain('mass-ping');
+    expect(d.action).toBe('delete');
+  });
+  it('@here and @all are caught', () => {
+    expect(ping('@here').reasons).toContain('mass-ping');
+    expect(ping('pessoal @all vejam').reasons).toContain('mass-ping');
+  });
+  it('catches a token at the very start and in parentheses', () => {
+    expect(ping('@everyone').reasons).toContain('mass-ping');
+    expect(ping('(@channel) meeting now').reasons).toContain('mass-ping');
+  });
+  it('combined with a scam link it climbs to mute + escalate', () => {
+    const d = moderateMessage({ text: '@everyone validate your wallet seed phrase now', memberTrust: 'NEW', accountAgeDays: 0 });
+    expect(d.reasons).toContain('mass-ping');
+    expect(d.escalate).toBe(true);
+  });
+  it('does NOT flag an email-like address or a normal @username', () => {
+    expect(ping('mail me at name@everyone.com').reasons).not.toContain('mass-ping');
+    expect(ping('thanks @alice and @bob').reasons).not.toContain('mass-ping');
+    expect(ping('@allan can you help').reasons).not.toContain('mass-ping'); // @all is a prefix of @allan
+  });
+  it('a plain message is untouched', () => expect(ping('gm everyone, how do i submit?').reasons).not.toContain('mass-ping'));
+});
+
 describe('false positives stay calm', () => {
   it('legit PT allowed', () => {
     const d = moderateMessage({ text: 'gm! como eu envio minha submissao?', memberTrust: 'MEMBER', accountAgeDays: 30 });
