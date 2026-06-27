@@ -15,6 +15,14 @@
     ],
     "_note": "Real admins/staff (FULL distinctive display names + handles). A non-admin who copies one of these names, or uses a look-alike handle, is muted (can't message) and escalated. Use the full distinctive name to avoid false positives on common first names."
   },
+  "immunity": {
+    "roles": ["Core Mods", "Moderator", "Superteam Earn", "SuperTeam BR", "Superteam XP", "Zapier", "MEE6", "Tektools"],
+    "botMasters": [],
+    "immuneServerOwner": true,
+    "immuneAdminPermission": true,
+    "immuneBots": true,
+    "_note": "MEE6-style Immunity Roles (examples/immunity.ts): holders are exempt from BOTH auto-moderation and escalation. Server owner, Administrator-permission roles, listed bot masters (user ids), and bots are immune by default — set the flags to false to disable. Roles match by name OR id (normalized: leading @ stripped, case-insensitive). On Discord, roles map directly to server roles; on Telegram there are no custom roles, so an admin's custom_title is matched and chat creator/administrators are owner/admin. SECURITY: immunity is config-only — a message claiming admin/immunity is ignored (see resources/security.md)."
+  },
   "welcome": {
     "enabled": true,
     "message": "Welcome to {community}, {name}! 👋 Please read the rules: {rules}. Never share your seed phrase — admins will never DM you first.",
@@ -43,6 +51,41 @@
       "frase de recuperacao"
     ],
     "_note_bannedSubstrings": "Matched as NORMALIZED substrings (examples/normalize.ts), never compiled as raw regex — avoids ReDoS."
+  },
+  "contentFilters": {
+    "_note": "Combot 'Filters' parity — deterministic content-type filters applied by examples/content-filters.ts BEFORE the scam scorer. Each value is the action when a message carries that content type: allow | warn | delete | mute | kick | ban (or 'off' = disabled = allow). Order mirrors the Combot panel. NEW/FLAGGED members are additionally restricted by trust.newMemberNoLinks / newMemberNoMedia even when a filter says 'allow'.",
+    "wordsFilter": "delete",
+    "_note_wordsFilter": "Action taken when a moderation.bannedSubstrings term matches. The word list itself lives in moderation.bannedSubstrings (normalized substrings, never raw regex).",
+    "links": "delete",
+    "_note_links": "Action for any non-whitelisted link. The domain allow/block lists are community.officialDomains / community.blocklistDomains — whitelisted links are never filtered.",
+    "rtlCharacters": "allow",
+    "commands": "allow",
+    "games": "allow",
+    "voiceMessages": "allow",
+    "files": "allow",
+    "videoMessages": "allow",
+    "audioFiles": "allow",
+    "messagesFromChannels": "allow",
+    "animatedDice": "allow",
+    "mentions": "allow",
+    "_note_mentions": "Filters ANY @mention. Separate from the scorer's mass-mention signal (>=5 mentions), which always scores regardless of this filter.",
+    "viaInlineBots": "allow",
+    "stickers": "allow",
+    "gifs": "allow",
+    "externalQuotes": "allow",
+    "stories": "allow",
+    "images": "allow",
+    "customEmojis": "allow",
+    "editedMessages": "allow",
+    "videos": "allow",
+    "serviceMessages": "allow",
+    "contacts": "allow",
+    "forwards": "allow",
+    "duplicateTextMessages": "allow",
+    "guestMode": "allow",
+    "_note_guestMode": "Member-state policy, not a per-message type: restrict unverified 'guest' members. Enforce via the trust state machine, not the message detector.",
+    "messageLength": { "action": "off", "max": 0 },
+    "_note_messageLength": "Set action to delete/warn and max to a character count to cap long messages. 'off' disables it."
   },
   "adjudication": {
     "grayZoneLow": 30,
@@ -78,6 +121,61 @@
     "logRetentionDays": 30,
     "redactPatterns": ["seed phrase", "private key", "frase de recuperacao"],
     "honorDeleteRequests": true
+  },
+  "auditLog": {
+    "enabled": true,
+    "channel": "REPLACE_ME_log_channel_id",
+    "ignoredChannels": [],
+    "dontLogBots": true,
+    "dontDisplayThumbnails": false,
+    "_note": "MEE6 'Audit Logging' parity (examples/audit-log.ts). Sends server events to `channel`. Toggle any event below (omit/true = on, false = off). ignoredChannels skips message edit/delete events in those channels. dontLogBots skips events whose ACTOR is a bot (your own auto-mod actions log as 'agent', not a bot). PRIVACY: logs metadata only — who/what/where/when — never deleted/edited message CONTENT (unlike MEE6), honoring privacy.storeRawMessages.",
+    "events": {
+      "moderation": { "memberMuted": true, "memberUnmuted": true, "moderationBan": true, "moderationAction": true },
+      "message": { "messageUpdated": true, "messageDeleted": true, "invitePosted": true },
+      "member": { "nicknameChanged": true, "memberBanned": true, "memberJoined": true, "memberLeft": true, "memberUnbanned": true, "userUpdated": true },
+      "role": { "roleCreated": true, "roleUpdated": true, "roleDeleted": true, "memberRolesChanged": true },
+      "voice": { "memberJoinedVoice": true, "memberLeftVoice": true },
+      "server": { "serverEdited": true, "emojisUpdated": true },
+      "channel": { "channelCreated": true, "channelUpdated": true, "channelDeleted": true }
+    }
+  },
+  "ticketing": {
+    "enabled": true,
+    "_note": "MEE6 'Ticketing' parity (Discord). Core logic in examples/ticketing.ts; discord.js wiring in examples/discord/ticketing.ts. A panel button opens a private channel under `openCategory`; ticket managers run the /ticket-* commands; a transcript is built on close/delete. NOTE: transcripts intentionally contain message content (the record the opener asked for) — keep them to the transcript channel and respect retention.",
+    "commands": { "claim": false, "close": true, "delete": true, "reopen": true },
+    "_note_commands": "Toggle the slash commands. MEE6 default: claim off, close/delete/reopen on. Only ticket managers can run them, inside a ticket channel.",
+    "panels": [
+      {
+        "id": "suporte",
+        "name": "Superteam Suporte",
+        "publishChannel": "atendimento",
+        "managerRoles": ["Moderator"],
+        "panelMessage": {
+          "title": "Canal de Suporte",
+          "description": "Este é o suporte da Superteam Brasil. Clique no botão para abrir seu ticket pessoal com o time de suporte.",
+          "color": "#5865F2"
+        },
+        "types": [{ "id": "abrir", "label": "Abrir ticket", "emoji": "🎫", "color": "red" }],
+        "introMessage": "Seu ticket foi criado {opener} @Core Mods @Moderator.\nPor favor forneça as informações relevantes para que possamos te ajudar melhor.",
+        "openCategory": "SUPORTE",
+        "closedCategory": "SUPORTE",
+        "transcript": { "channel": "transcripts", "dmToOpener": true },
+        "maxOpenPerUser": 1
+      }
+    ]
+  },
+  "analytics": {
+    "enabled": true,
+    "tzOffsetMinutes": -180,
+    "lastJoinedLeftN": 5,
+    "retentionDays": 90,
+    "_note": "Combot 'Analytics' parity (examples/analytics.ts). Computed from join/leave/message EVENTS — member id + timestamp only, NEVER message content. tzOffsetMinutes sets the timezone for daily/heatmap bucketing (-180 = UTC-3 / BRT). Each metric is compared to the immediately preceding equal-length window. Keep raw events only retentionDays, then drop to aggregates."
+  },
+  "directory": {
+    "defaultFilter": "current",
+    "defaultSort": "lastMsg",
+    "perPage": 50,
+    "_note": "Member roster (examples/member-directory.ts) — Combot 'Users' table WITHOUT XP. Columns: ID, Name, Username, MSG (period), AD active-days, Warns, MSG(all), Last msg, Joined, Left, Lang, Trust. defaultFilter: current|all|left. defaultSort: name|msga|activeDays|warns|msgAll|lastMsg|joined|left. Surfaced in the bots as /members (Telegram) and !members (Discord), admin-only."
   },
   "escalation": {
     "modChannel": "REPLACE_ME",

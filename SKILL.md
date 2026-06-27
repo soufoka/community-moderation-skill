@@ -76,8 +76,17 @@ Transitions are driven by signals and time. Full transition rules and thresholds
 1. **Normalize, then score.** Run `normalizeForMatch()` ([`examples/normalize.ts`](examples/normalize.ts)) first so homoglyph / zero-width / leet / accent evasions are undone, then combine signals (suspicious URLs, links, mass-mentions, flood, multilingual scam-pattern match, member trust, account age). Scorer: [`examples/moderate-message.ts`](examples/moderate-message.ts).
 2. **Pick the action** from the matrix, gated by confidence and member state.
 3. **Apply with the least force that works.** Prefer delete/warn over mute, mute over ban. Escalate, don't jump.
-4. **Log every action** (target, action, reason, signal, confidence, actor) for audit — schema in [`resources/data-schemas.md`](resources/data-schemas.md).
+   - **Immunity first:** before enforcing, check [`examples/immunity.ts`](examples/immunity.ts) — owners, Administrator-permission roles, configured **immune roles**, bot masters, and bots are exempt from auto-mod **and** escalation (MEE6-style *Immunity Roles*). Stronger than `TRUSTED` (which still escalates). Roster in `foka-config.json` → `immunity`; details in [`resources/moderation-policy.md`](resources/moderation-policy.md#immunity-allowlist).
+4. **Log every action** (target, action, reason, signal, confidence, actor) for audit — schema in [`resources/data-schemas.md`](resources/data-schemas.md). Beyond the per-action record, an **audit-log stream** ([`examples/audit-log.ts`](examples/audit-log.ts), MEE6 *Audit Logging* parity) routes server events — moderation / message / member / role / voice / server / channel (24 event types) — to a logging channel, gated by per-event toggles, ignored channels, and a bot filter. Metadata only, **never message content**. Config in `foka-config.json` → `auditLog`; catalog in [`resources/audit-log.md`](resources/audit-log.md).
 5. **Raids:** on a join spike, trigger lockdown (slow mode, restrict new members, hold media) — protocol in [`resources/moderation-policy.md`](resources/moderation-policy.md).
+
+### Content-type filters (Combot parity)
+
+Before the scorer, run a deterministic pass over **what kind of content a message is** — the same catalog a Telegram group runs in Combot's *Filters* tab (links, stickers, GIFs, forwards, edits, voice/video, channel posts, message length, …). This is independent of scam scoring: a filtered content type is removed regardless of how innocent its text reads.
+
+- **All 27 filters** are configured in [`templates/foka-config.json`](templates/foka-config.json) → `contentFilters`, each set to an action (`allow | warn | delete | mute | kick | ban`, or `off`). When several match one message, the **strictest** wins.
+- **Trust-aware:** `NEW`/`FLAGGED` members are auto-restricted by `trust.newMemberNoLinks` / `newMemberNoMedia` even when a filter says `allow`, so you can keep media open for the room but gated for fresh accounts.
+- **Logic:** [`examples/content-filters.ts`](examples/content-filters.ts) — `detectTelegramFeatures()` maps a Telegram message to the features present, `applyContentFilters()` resolves the action. Full catalog + Telegram-signal mapping: [`resources/content-filters.md`](resources/content-filters.md).
 
 ## Pillar 2 — Contact management
 
@@ -106,6 +115,10 @@ Every inbound question gets exactly one **tag** and a **priority**. Full taxonom
 
 Before opening a ticket, **dedupe**: check for a matching known issue or an existing open ticket and link instead of duplicating.
 
+## Support tickets (MEE6 ticketing parity)
+
+Beyond tagging/routing, members can open **private support tickets** from a panel button. [`examples/ticketing.ts`](examples/ticketing.ts) is the transport-agnostic lifecycle core — panels, a ticket state machine (`open → claimed → closed → reopened → deleted`), manager-role permission checks, per-panel sequence numbers + `maxOpenPerUser`, and a transcript builder; [`examples/discord/ticketing.ts`](examples/discord/ticketing.ts) binds it to discord.js (a button opens a hidden channel scoped to the opener + manager roles; `/ticket-claim|close|reopen|delete` run only inside a ticket channel by a manager; transcript on close/delete). Panels + command toggles live in `foka-config.json` → `ticketing`; the reference bot publishes a panel with **`!ticket-setup`**. Full spec: [`resources/ticketing.md`](resources/ticketing.md). Transcripts are the one place message content is materialized — by design, and kept to the transcript channel.
+
 ## Pillar 4 — Message persona redirect
 
 Routing maps an intent/tag to a **persona** (who answers), a **channel** (where), and a **handoff** (a clean summary). See [`examples/classify-and-route.ts`](examples/classify-and-route.ts).
@@ -119,6 +132,19 @@ Suggested owner: <persona> in <channel>
 ```
 
 Personas and routing rules are **community-specific** — configure them in [`templates/foka-config.json`](templates/foka-config.json). Ship with placeholders; never invent real handles.
+
+## Group analytics (observability)
+
+Beyond acting on messages, the agent reports on the community — the same tiles Combot's *Analytics* shows: **Joined**, **Left**, net growth, **Messages**, **Active users**, **Avg DAU**, **Avg daily msgs**, last-joined / last-left, and a day-of-week × hour **activity heatmap** — each compared to the immediately preceding window (% change).
+
+- **Privacy-first:** computed from a `join | leave | message` event log carrying only **type + member id + timestamp** — never message content. Fits the "store ids, not transcripts" rule.
+- **Logic:** [`examples/analytics.ts`](examples/analytics.ts) — `buildReport(events, period)` produces the metrics; `formatReport()` and `renderHeatmap()` render them as plain text so the agent can post a `/stats` reply or a weekly digest into the mod channel. Timezone via `analytics.tzOffsetMinutes` (e.g. `-180` = BRT). Full spec: [`resources/analytics.md`](resources/analytics.md).
+
+### Member directory (the "Users" roster)
+
+A sortable, filterable, paginated roster of every member — the Combot *Users* table **without XP** (trust state replaces it). [`examples/member-directory.ts`](examples/member-directory.ts) joins each `MemberRecord` with its message aggregates from the event log into rows of **ID · Name · Username · MSG (period) · AD (active days x/N) · Warns · MSG(all) · Last msg · Joined · Left · Lang · Trust**, with **Current / All / Left** tabs (`counts`), column sort, pagination, `toCSV()` export, and `renderTable()` for chat. Spec: [`resources/member-directory.md`](resources/member-directory.md).
+
+Both reference bots wire this live: events are recorded as they happen via [`examples/event-log.ts`](examples/event-log.ts) (`join`/`leave`/`message`, counts only — no content), and admins get **`/help`** (command list), **`/stats`** (analytics), **`/members [current|all|left]`** (roster), and **`/immunity [@user]`** (who's exempt + why) — Telegram gates on `getChatMember`, Discord on `ManageGuild`.
 
 ## Solana community safety (the differentiator)
 
@@ -232,6 +258,11 @@ community-moderation/
 │   └── triggering.md              # When the skill should (and shouldn't) load
 ├── resources/
 │   ├── moderation-policy.md       # Trust states, action matrix, escalation ladder, raid protocol
+│   ├── content-filters.md         # Combot-parity content-type filter catalog (27 filters)
+│   ├── analytics.md               # Combot-parity group analytics (growth, engagement, heatmap)
+│   ├── member-directory.md        # Combot-parity member roster ("Users" table, no XP)
+│   ├── audit-log.md               # MEE6-parity audit logging (24 events → log channel)
+│   ├── ticketing.md               # MEE6-parity support tickets (panels, lifecycle, transcript)
 │   ├── support-taxonomy.md        # Tag taxonomy, priorities, SLAs, routing
 │   ├── scam-patterns.md           # Multilingual (EN+PT) scam catalog + case studies
 │   ├── security.md                # Threat model: injection, evasion, ReDoS, abuse, privacy
@@ -241,8 +272,16 @@ community-moderation/
 │   └── data-schemas.md            # MemberRecord, SupportTicket, ModerationAction, RoutingConfig
 ├── examples/
 │   ├── normalize.ts               # Evasion-resistant text/URL normalization
+│   ├── immunity.ts                # Immunity roles (MEE6 parity): owner/admin/role/bot-master allowlist
+│   ├── content-filters.ts         # Content-type filters (Combot parity): detect + resolve action
+│   ├── audit-log.ts               # Audit logging (MEE6 parity): gate + format + dispatch events
+│   ├── analytics.ts               # Group analytics (Combot parity): metrics, heatmap, renderers
+│   ├── member-directory.ts        # Member roster (Combot "Users", no XP): filter/sort/paginate/CSV
+│   ├── event-log.ts               # Append-only group event log (join/leave/message; counts only)
+│   ├── commands-help.ts           # Admin command list (/help · !help), shared by both bots
 │   ├── moderate-message.ts        # Multilingual scorer + action decision (+ external signals)
 │   ├── classify-and-route.ts      # Support classification + persona routing
+│   ├── ticketing.ts               # Ticket lifecycle core (MEE6 parity): panels, state machine, transcript
 │   ├── llm-adjudicator.ts         # Gray-zone LLM adjudication (injected judge)
 │   ├── enrich-token.ts            # Token/address risk via injected lookup
 │   ├── member-store.ts            # MemberStore interface + in-memory impl
@@ -252,7 +291,8 @@ community-moderation/
 │   ├── telegram/
 │   │   └── bot.ts                 # Reference grammY bot (full wiring)
 │   ├── discord/
-│   │   └── bot.ts                 # Reference discord.js bot (full wiring)
+│   │   ├── bot.ts                 # Reference discord.js bot (full wiring)
+│   │   └── ticketing.ts           # Discord ticketing: panel button → channel, /ticket-* commands, transcript
 │   ├── mcp/
 │   │   └── server.ts              # MCP server (moderate/classify/scan_urls tools)
 │   └── ci/

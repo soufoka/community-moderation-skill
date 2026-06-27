@@ -16,10 +16,12 @@ export interface Warning {
 
 export interface MemberRecord {
   id: string; // stable platform id (NOT the handle)
-  handle: string;
+  handle: string; // @username (the "Username" column) — may change; id is the key
+  displayName?: string; // the "Name" column (first+last / server nick)
   platform: 'telegram' | 'discord';
   joinedAt: string; // ISO — first seen
   lastSeenAt: string; // ISO — last activity
+  leftAt?: string; // ISO — set when the member leaves (drives the "Left" roster tab)
   trustState: TrustState;
   roles: string[]; // e.g. ['mod', 'contributor']
   tags: string[]; // relationship/segments: 'vip', 'partner', 'press', ...
@@ -47,11 +49,17 @@ export const DEFAULT_CONTACT_POLICY: ContactPolicy = {
   flagDecayDays: 14,
 };
 
-export function newMember(id: string, handle: string, platform: 'telegram' | 'discord'): MemberRecord {
+export function newMember(
+  id: string,
+  handle: string,
+  platform: 'telegram' | 'discord',
+  displayName?: string,
+): MemberRecord {
   const now = new Date().toISOString();
   return {
     id,
     handle,
+    displayName,
     platform,
     joinedAt: now,
     lastSeenAt: now,
@@ -108,8 +116,11 @@ export function maybePromote(
 export interface MemberStore {
   get(id: string): Promise<MemberRecord | undefined>;
   upsert(rec: MemberRecord): Promise<void>;
+  all(): Promise<MemberRecord[]>;
   recordWarning(id: string, w: Omit<Warning, 'at'>): Promise<void>;
   recordInteraction(id: string, at?: string): Promise<void>;
+  recordMessage(id: string, at?: string): Promise<void>;
+  markLeft(id: string, at?: string): Promise<void>;
   addTag(id: string, tag: string): Promise<void>;
   setTrust(id: string, state: TrustState): Promise<void>;
   note(id: string, text: string): Promise<void>;
@@ -126,6 +137,25 @@ export class InMemoryMemberStore implements MemberStore {
 
   async upsert(rec: MemberRecord): Promise<void> {
     this.map.set(rec.id, rec);
+  }
+
+  async all(): Promise<MemberRecord[]> {
+    return [...this.map.values()];
+  }
+
+  /** Count a (kept) message: bumps all-time total and last-seen. A rejoin clears `leftAt`. */
+  async recordMessage(id: string, at: string = new Date().toISOString()): Promise<void> {
+    const rec = this.map.get(id);
+    if (!rec) return;
+    rec.messageCount += 1;
+    rec.lastSeenAt = at;
+    if (rec.leftAt) rec.leftAt = undefined; // they're back
+  }
+
+  /** Mark a member as having left (moves them to the "Left" roster tab). */
+  async markLeft(id: string, at: string = new Date().toISOString()): Promise<void> {
+    const rec = this.map.get(id);
+    if (rec) rec.leftAt = at;
   }
 
   async recordWarning(id: string, w: Omit<Warning, 'at'>): Promise<void> {
