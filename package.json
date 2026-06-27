@@ -1,14 +1,41 @@
 {
   "name": "community-moderation-skill",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "MIT",
-  "description": "Foka AI — evasion-resistant, multilingual (EN/PT/ES) community moderation & member-support skill for Solana Telegram/Discord communities.",
+  "description": "Foka AI — evasion-resistant, multilingual community moderation & member-support skill (plugin) for Solana Telegram/Discord communities: anti-scam moderation, content filters, analytics, immunity, audit logging, and ticketing.",
   "type": "module",
+  "author": "Foka (Superteam BR) (https://github.com/soufoka)",
+  "homepage": "https://github.com/soufoka/community-moderation-skill#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soufoka/community-moderation-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/soufoka/community-moderation-skill/issues"
+  },
+  "bin": {
+    "community-moderation-skill": "bin/install.js"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "smoke": "tsx examples/selftest.ts"
+    "smoke": "tsx skills/community-moderation/examples/selftest.ts"
+  },
+  "files": [
+    "skills/",
+    "agents/",
+    "commands/",
+    ".claude-plugin/",
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "solana",
@@ -17,8 +44,12 @@
     "anti-scam",
     "telegram",
     "discord",
+    "support",
+    "ticketing",
     "agent-skill",
-    "claude"
+    "claude",
+    "claude-code",
+    "superteam"
   ],
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

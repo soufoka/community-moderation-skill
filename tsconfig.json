@@ -10,5 +10,5 @@
     "resolveJsonModule": true,
     "types": ["node"]
   },
-  "include": ["examples/**/*.ts", "tests/**/*.ts"]
+  "include": ["skills/community-moderation/examples/**/*.ts", "skills/community-moderation/tests/**/*.ts"]
 }

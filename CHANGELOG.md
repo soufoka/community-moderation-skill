@@ -2,6 +2,13 @@
 
 All notable changes to this skill are documented here.
 
+## [1.0.0] — 2026-06-27
+
+### Changed (repackaged as a Claude Code plugin)
+- Restructured the repo into a distributable **Claude Code plugin**: added `.claude-plugin/plugin.json` + `.claude-plugin/marketplace.json` (installable via `/plugin marketplace add`), moved the skill under `skills/community-moderation/` (SKILL.md + examples/resources/templates/docs/tests/rules, self-contained), and kept `agents/` + `commands/` as plugin components at the root.
+- Replaced `install.sh` with a Node installer `bin/install.js` (ESM, dependency-free) exposed as the `community-moderation-skill` bin, so `npx community-moderation-skill` vendors the plugin into `./.claude`.
+- Updated build config (`tsconfig.json`, `vitest.config.ts`), `package.json` (bin/files/engines/repository + version 1.0.0), and all cross-file references (README, CLAUDE.md, the agent and command) to the new paths. No source logic changed — 230 tests / typecheck / smoke still green.
+
 ## [0.6.1] — 2026-06-26
 
 ### Fixed (review hardening pass)

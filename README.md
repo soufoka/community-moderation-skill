@@ -18,19 +18,19 @@ Foka AI is a tireless helper that reads every message in your group and asks two
 - **Acting safely.** When it spots a scam it removes the message and quietly alerts the human moderators — but it **never bans anyone on its own**; a human always makes the serious calls. And it won't punish trusted mods (they're usually the ones *warning* about scams).
 - **Helping members.** For normal questions ("my wallet won't connect", "where's my payout?") it sorts them by topic and urgency and routes them to the right person.
 
-Open-source (MIT), with 108 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
+Open-source (MIT), with 230 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
 
 ## Features
 
 - **Evasion-resistant detection** — folds homoglyphs (`оrса`→`orca`), zero-width/bidi chars, leetspeak (`s33d`), and accents before matching, so disguises don't slip through.
-- **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip. Opt-in [`confusables-pro`](examples/confusables-pro.ts) swaps in the complete Unicode (TR39) table.
+- **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip. Opt-in [`confusables-pro`](skills/community-moderation/examples/confusables-pro.ts) swaps in the complete Unicode (TR39) table.
 - **URL defense** — punycode, raw-IP, deep-subdomain, **brand-impersonation** (`superteam.gift`), blocklist, and a shortener-unshorten hook.
 - **Solana scam catalog** — drainers, seed-phrase phishing, admin impersonation, fake giveaways, honeypots — extensible and versioned.
 - **Support triage + routing** — 11-tag taxonomy with P1–P4 SLAs and persona/channel routing.
 - **Gray-zone LLM adjudication** — ambiguous scores get an optional, **injection-safe** LLM second opinion.
 - **Cross-skill composition** — pulls on-chain risk from `birdeye`/`helius`/`wallet-analysis` to expose honeypots a lexicon can't see.
 - **Safe by design** — bans/kicks are human-gated; the agent rate-limits itself, ignores other bots, and is idempotent.
-- **Deployable** — reference [Telegram](examples/telegram/bot.ts) + [Discord](examples/discord/bot.ts) bots and an [MCP server](examples/mcp/server.ts).
+- **Deployable** — reference [Telegram](skills/community-moderation/examples/telegram/bot.ts) + [Discord](skills/community-moderation/examples/discord/bot.ts) bots and an [MCP server](skills/community-moderation/examples/mcp/server.ts).
 
 ## Quickstart
 
@@ -44,7 +44,7 @@ npm run smoke     # quick runnable demo (tsx)
 Use the logic directly:
 
 ```ts
-import { moderateMessage } from './examples/moderate-message';
+import { moderateMessage } from './skills/community-moderation/examples/moderate-message';
 
 moderateMessage({
   text: 'official support: validate your wallet here',
@@ -68,35 +68,53 @@ message ──▶ normalize (anti-evasion) ──▶ score (multilingual lexicon
        delete/mute (always)            ban/kick → HUMAN              clean → classify + route
 ```
 
-The detection core (normalize / moderate / classify) is **pure and dependency-free**; the optional [`confusables-pro`](examples/confusables-pro.ts) module adds full TR39 homoglyph coverage via the `confusables` lib, and transports (grammY/discord.js) + the MCP server are thin adapters. See [SKILL.md](SKILL.md) for the full agent instructions.
+The detection core (normalize / moderate / classify) is **pure and dependency-free**; the optional [`confusables-pro`](skills/community-moderation/examples/confusables-pro.ts) module adds full TR39 homoglyph coverage via the `confusables` lib, and transports (grammY/discord.js) + the MCP server are thin adapters. See [skills/community-moderation/SKILL.md](skills/community-moderation/SKILL.md) for the full agent instructions.
 
 ## Security
 
-A moderation agent is itself an attack surface. Foka AI treats every message as hostile input: **prompt-injection isolation** (content is data, never instructions), ReDoS-safe matching, anti-brigading, privacy/retention, and least-privilege secrets. Full threat model: [resources/security.md](resources/security.md).
+A moderation agent is itself an attack surface. Foka AI treats every message as hostile input: **prompt-injection isolation** (content is data, never instructions), ReDoS-safe matching, anti-brigading, privacy/retention, and least-privilege secrets. Full threat model: [resources/security.md](skills/community-moderation/resources/security.md).
 
 ## Testing
 
-Run with `npm test` (vitest). The suite covers normalization/evasion, multilingual scam detection, false-positives, URL defense, the LLM adjudicator, deploy utils, and a **labeled regression corpus** ([examples/eval-cases.ts](examples/eval-cases.ts)) so detection can't silently regress. Extend the corpus with the real evasions you see in the wild.
+Run with `npm test` (vitest). The suite covers normalization/evasion, multilingual scam detection, false-positives, URL defense, the LLM adjudicator, deploy utils, and a **labeled regression corpus** ([examples/eval-cases.ts](skills/community-moderation/examples/eval-cases.ts)) so detection can't silently regress. Extend the corpus with the real evasions you see in the wild.
 
 ## Structure
 
+A self-contained **Claude Code plugin** — the skill, its agent, and its command bundled so it can be installed as one unit from a marketplace.
+
 ```
 community-moderation-skill/
-├── SKILL.md                 # Main agent instructions
-├── resources/               # Policy, taxonomy, scam catalog, security, schemas
-├── docs/                    # Quickstart + triggering eval set
-├── examples/                # Pure TS logic + Telegram/Discord bots + MCP server
-├── templates/               # foka-config.json
-├── tests/                   # vitest suite (+ regression corpus)
-├── commands/ agents/ rules/ # Claude Code command, agent, and rules
-└── install.sh               # Install into a Claude Code skills directory
+├── .claude-plugin/
+│   ├── plugin.json          # Plugin manifest (name, version, author)
+│   └── marketplace.json     # Marketplace entry — makes it installable
+├── skills/
+│   └── community-moderation/
+│       ├── SKILL.md         # Main agent instructions
+│       ├── resources/       # Policy, taxonomy, scam catalog, security, schemas
+│       ├── docs/            # Quickstart + triggering eval set
+│       ├── examples/        # Pure TS logic + Telegram/Discord bots + MCP server
+│       ├── templates/       # foka-config.json
+│       ├── tests/           # vitest suite (+ regression corpus)
+│       └── rules/           # moderation rules
+├── agents/community-mod.md  # Moderation subagent (plugin component)
+├── commands/moderate.md     # /moderate slash command (plugin component)
+└── bin/install.js           # Node installer (vendors the plugin into ./.claude)
 ```
 
-## Install as a Claude Code skill
+## Install
+
+**As a Claude Code plugin (recommended — all projects):**
+
+```
+/plugin marketplace add soufoka/community-moderation-skill
+/plugin install community-moderation-skill@foka
+```
+
+**Into one project (vendors skill + agent + command into `./.claude`):**
 
 ```bash
-./install.sh                       # -> ~/.claude/skills/community-moderation
-./install.sh ./.claude/skills/foka # or a project-local path
+npx community-moderation-skill            # -> ./.claude (or ~/.claude)
+npx community-moderation-skill ./.claude  # explicit target
 ```
 
 ## Roadmap

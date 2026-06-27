@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "foka",
+  "owner": {
+    "name": "Foka (Superteam BR)",
+    "url": "https://github.com/soufoka"
+  },
+  "description": "Foka — Claude Code skills and plugins for Solana community safety & member support.",
+  "plugins": [
+    {
+      "name": "community-moderation-skill",
+      "source": "./",
+      "description": "Community moderation & support for Solana groups: anti-scam moderation, content filters, group analytics, member roster, immunity roles, audit logging, and ticketing (Telegram/Discord)."
+    }
+  ]
+}
