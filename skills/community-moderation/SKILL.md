@@ -1,21 +1,23 @@
 ---
 name: community-moderation
-description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, and admin impersonation; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
+description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, admin impersonation, and channel-wide @everyone/@here/@all pings from non-admins; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Also covers community operations with Combot/MEE6 parity — content-type filters, group analytics with an activity heatmap, a member roster, immunity roles, audit logging, and support ticketing. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
 license: MIT
 metadata:
   author: Foka (Superteam BR)
-  version: 1.0.0
+  version: 1.1.1
 tags:
   - community-moderation
   - moderation
   - telegram
   - discord
   - support
-  - ticket-triage
+  - ticketing
   - anti-scam
   - solana-community
   - contact-management
   - message-routing
+  - audit-log
+  - analytics
 ---
 
 # Foka AI — Community Moderation & Support

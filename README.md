@@ -18,7 +18,7 @@ Foka AI is a tireless helper that reads every message in your group and asks two
 - **Acting safely.** When it spots a scam it removes the message and quietly alerts the human moderators — but it **never bans anyone on its own**; a human always makes the serious calls. And it won't punish trusted mods (they're usually the ones *warning* about scams).
 - **Helping members.** For normal questions ("my wallet won't connect", "where's my payout?") it sorts them by topic and urgency and routes them to the right person.
 
-Open-source (MIT), with 230 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
+Open-source (MIT), with 240 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
 
 ## Features
 
@@ -26,6 +26,8 @@ Open-source (MIT), with 230 automated tests — runs as a Telegram/Discord bot o
 - **Multilingual (10 languages)** — scam + support lexicons in EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA, with **script-aware** normalization: Cyrillic/Greek fold only in mixed-script tokens (genuine Russian survives), and Hangul/kana survive an NFKD→NFC round-trip. Opt-in [`confusables-pro`](skills/community-moderation/examples/confusables-pro.ts) swaps in the complete Unicode (TR39) table.
 - **URL defense** — punycode, raw-IP, deep-subdomain, **brand-impersonation** (`superteam.gift`), blocklist, and a shortener-unshorten hook.
 - **Solana scam catalog** — drainers, seed-phrase phishing, admin impersonation, fake giveaways, honeypots — extensible and versioned.
+- **Channel-wide ping guard** — `@everyone`/`@here`/`@all` from a non-admin is removed (configurable token list); admins exempt via immunity/trust.
+- **Community operations (Combot + MEE6 parity)** — content-type [filters](skills/community-moderation/resources/content-filters.md), group [analytics + activity heatmap](skills/community-moderation/resources/analytics.md), a [member roster](skills/community-moderation/resources/member-directory.md), [immunity roles](skills/community-moderation/resources/moderation-policy.md), [audit logging](skills/community-moderation/resources/audit-log.md), and [ticketing](skills/community-moderation/resources/ticketing.md), with admin slash-commands (`/stats`, `/members`, `/immunity`, `/help`).
 - **Support triage + routing** — 11-tag taxonomy with P1–P4 SLAs and persona/channel routing.
 - **Gray-zone LLM adjudication** — ambiguous scores get an optional, **injection-safe** LLM second opinion.
 - **Cross-skill composition** — pulls on-chain risk from `birdeye`/`helius`/`wallet-analysis` to expose honeypots a lexicon can't see.
