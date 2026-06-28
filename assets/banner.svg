@@ -22,13 +22,13 @@
   <rect x="0" y="0" width="1200" height="6" rx="3" fill="url(#accent)"/>
   <rect x="0" y="294" width="1200" height="6" rx="3" fill="url(#accent)"/>
 
-  <!-- safety shield emblem -->
-  <circle cx="160" cy="150" r="120" fill="url(#glow)"/>
-  <g transform="translate(95,62)">
-    <path d="M65 0 L130 24 V82 C130 124 100 150 65 165 C30 150 0 124 0 82 V24 Z"
-          fill="url(#shield)" stroke="url(#accent)" stroke-width="3"/>
-    <path d="M36 82 L58 106 L96 56" fill="none" stroke="url(#accent)"
-          stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- safe-chat emblem: a community speech bubble with a verified check -->
+  <circle cx="156" cy="150" r="118" fill="url(#glow)"/>
+  <g transform="translate(86,84)">
+    <path d="M24 2 H116 C130 2 140 12 140 26 V78 C140 92 130 102 116 102 H56 L34 128 L46 102 H24 C10 102 0 92 0 78 V26 C0 12 10 2 24 2 Z"
+          fill="url(#shield)" stroke="url(#accent)" stroke-width="3.5"/>
+    <path d="M40 52 L62 74 L100 32" fill="none" stroke="url(#accent)"
+          stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
