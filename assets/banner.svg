@@ -22,13 +22,20 @@
   <rect x="0" y="0" width="1200" height="6" rx="3" fill="url(#accent)"/>
   <rect x="0" y="294" width="1200" height="6" rx="3" fill="url(#accent)"/>
 
-  <!-- safe-chat emblem: a community speech bubble with a verified check -->
-  <circle cx="156" cy="150" r="118" fill="url(#glow)"/>
-  <g transform="translate(86,84)">
-    <path d="M24 2 H116 C130 2 140 12 140 26 V78 C140 92 130 102 116 102 H56 L34 128 L46 102 H24 C10 102 0 92 0 78 V26 C0 12 10 2 24 2 Z"
+  <!-- Foka — a watchful seal (foca), guardian of the community waters -->
+  <circle cx="156" cy="150" r="122" fill="url(#glow)"/>
+  <g transform="translate(86,77)">
+    <path d="M70 8 C100 8 124 30 124 62 C124 92 108 116 88 130 C82 135 76 138 70 138 C64 138 58 135 52 130 C32 116 16 92 16 62 C16 30 40 8 70 8 Z"
           fill="url(#shield)" stroke="url(#accent)" stroke-width="3.5"/>
-    <path d="M40 52 L62 74 L100 32" fill="none" stroke="url(#accent)"
-          stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <g stroke="url(#accent)" stroke-width="2.4" stroke-linecap="round" fill="none">
+      <path d="M58 106 L29 99"/><path d="M58 113 L27 113"/><path d="M58 120 L30 127"/>
+      <path d="M82 106 L111 99"/><path d="M82 113 L113 113"/><path d="M82 120 L110 127"/>
+    </g>
+    <circle cx="52" cy="58" r="12.5" fill="url(#accent)"/>
+    <circle cx="88" cy="58" r="12.5" fill="url(#accent)"/>
+    <circle cx="56" cy="54" r="3.6" fill="#0b1020"/>
+    <circle cx="92" cy="54" r="3.6" fill="#0b1020"/>
+    <path d="M59 101 C64 97 76 97 81 101 C81 110 74 118 70 121 C66 118 59 110 59 101 Z" fill="url(#accent)"/>
   </g>
 
   <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
