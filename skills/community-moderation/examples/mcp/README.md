@@ -6,9 +6,12 @@ Exposes the moderation logic as Model Context Protocol tools, so Claude/Cursor (
 
 | Tool | Input | Output |
 |------|-------|--------|
-| `moderate_message` | `text`, `memberTrust?`, `accountAgeDays?`, `officialDomains?`, `blocklistDomains?` | `Decision` (action, severity, score, reasons, escalate) |
+| `moderate_message` | `text`, `memberTrust?`, `accountAgeDays?`, `officialDomains?`, `blocklistDomains?`, `massPingTokens?` | `Decision` (action, severity, score, reasons, escalate) |
 | `classify_message` | `text` | `{ tag, priority }` |
 | `scan_urls` | `text`, `officialDomains?`, `blocklist?` | `UrlFinding[]` |
+| `apply_content_filters` | `present[]`, `config?`, `memberTrust?`, `newMemberNoLinks?`, `newMemberNoMedia?` | `FilterDecision` (strictest action + matched filters) |
+| `check_immunity` | `id?`, `roles?`, `isOwner?`, `hasAdminPermission?`, `isBot?`, `config?` | `{ immune, reason?, matchedRole? }` |
+| `build_analytics` | `events[]`, `from`, `to`, `tzOffsetMinutes?` | `AnalyticsReport` (joins/leaves/messages/active/DAU + heatmap) |
 
 ## Run
 

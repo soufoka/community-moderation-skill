@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="Foka AI — Community Moderation &amp; Support for Solana" width="860">
+</p>
+
 # Foka AI — Community Moderation Skill
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Tests](https://img.shields.io/badge/tests-passing-brightgreen.svg) ![Lang](https://img.shields.io/badge/10%20languages-EN%2FPT%2FES%2FID%2FVI%2FTR%2FRU%2FZH%2FKO%2FJA-orange.svg)
