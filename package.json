@@ -28,7 +28,6 @@
     "commands/",
     ".claude-plugin/",
     "bin/",
-    "assets/",
     "README.md",
     "LICENSE"
   ],

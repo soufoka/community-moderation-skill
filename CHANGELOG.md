@@ -6,7 +6,7 @@ All notable changes to this skill are documented here.
 
 ### Added
 - **3 new MCP tools** expose the community-ops layer so Claude/Cursor (or any MCP client) can call it directly: `apply_content_filters` (content-type filter decision), `check_immunity` (MEE6 immunity check), and `build_analytics` (group analytics + day×hour heatmap from an event log). `moderate_message` also gained the `massPingTokens` arg. The MCP server now exposes **6 tools** (was 3).
-- **README banner** (`assets/banner.svg`) and a Features entry covering the Combot/MEE6-parity community ops + the channel-wide ping guard.
+- **README** Features entry covering the Combot/MEE6-parity community ops + the channel-wide ping guard.
 
 ### Changed
 - **Quickstart** rewritten for the plugin layout — correct paths, the new config blocks (`contentFilters`/`immunity`/`auditLog`/`analytics`/`ticketing`/`massPingTokens`), and an admin command table (`/stats`, `/members`, `/immunity`, `/help`, `!ticket-setup`).
