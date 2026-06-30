@@ -1,10 +1,10 @@
 ---
 name: community-moderation
-description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, admin impersonation, and channel-wide @everyone/@here/@all pings from non-admins; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Also covers community operations with Combot/MEE6 parity — content-type filters, group analytics with an activity heatmap, a member roster, immunity roles, audit logging, and support ticketing. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
+description: Foka AI — moderate Solana community groups (Telegram, Discord) and run member support. Use to detect and act on spam, scam/drainer links, raids, admin impersonation, and channel-wide @everyone/@here/@all pings from non-admins; manage member contacts, roles, and reputation; triage and tag incoming support messages by priority; and redirect/route questions to the right persona, channel, or human. Also covers community operations with Combot/MEE6 parity — content-type filters, group analytics with an activity heatmap, a member roster, immunity roles, audit logging, and support ticketing — plus a compliant 1:1 WhatsApp support-intake channel (Business Cloud API) for scam-checks and ticket routing; WhatsApp has no API for group moderation, so this is not that. Includes a member trust-state machine, a signal→action moderation matrix, an escalation ladder, a support taxonomy, persona routing, Solana-specific scam patterns, multilingual (EN/PT/ES/ID/VI/TR/RU/ZH/KO/JA) evasion-resistant detection, prompt-injection defense, and Telegram Bot API / Discord integration patterns.
 license: MIT
 metadata:
   author: Foka (Superteam BR)
-  version: 1.2.0
+  version: 1.3.0
 tags:
   - community-moderation
   - moderation
@@ -121,6 +121,10 @@ Before opening a ticket, **dedupe**: check for a matching known issue or an exis
 ## Support tickets (MEE6 ticketing parity)
 
 Beyond tagging/routing, members can open **private support tickets** from a panel button. [`examples/ticketing.ts`](examples/ticketing.ts) is the transport-agnostic lifecycle core — panels, a ticket state machine (`open → claimed → closed → reopened → deleted`), manager-role permission checks, per-panel sequence numbers + `maxOpenPerUser`, and a transcript builder; [`examples/discord/ticketing.ts`](examples/discord/ticketing.ts) binds it to discord.js (a button opens a hidden channel scoped to the opener + manager roles; `/ticket-claim|close|reopen|delete` run only inside a ticket channel by a manager; transcript on close/delete). Panels + command toggles live in `foka-config.json` → `ticketing`; the reference bot publishes a panel with **`!ticket-setup`**. Full spec: [`resources/ticketing.md`](resources/ticketing.md). Transcripts are the one place message content is materialized — by design, and kept to the transcript channel.
+
+## WhatsApp (compliant 1:1 support intake — NOT group moderation)
+
+WhatsApp has no API, official or otherwise, to read or moderate a **group** chat — so this is not another moderation transport like Telegram/Discord. It's a member-initiated **1:1** channel on the official WhatsApp Business Cloud API: a member DMs the community's official number and gets either an advisory scam-check (link/claim scored by the same `moderateMessage`/`scanUrls` used everywhere else — no action taken, purely informational) or a routed support ticket via the **same** `ticketing.ts` core used by Discord. Pure logic + Cloud-API webhook signature verification: [`examples/whatsapp-intake.ts`](examples/whatsapp-intake.ts); the HTTP transport: [`examples/whatsapp/bot.ts`](examples/whatsapp/bot.ts). Config in `foka-config.json` → `whatsapp`; full scope and setup: [`resources/whatsapp-intake.md`](resources/whatsapp-intake.md) — **read it before assuming this covers group safety, it doesn't and can't.**
 
 ## Pillar 4 — Message persona redirect
 
@@ -266,6 +270,7 @@ community-moderation/
 │   ├── member-directory.md        # Combot-parity member roster ("Users" table, no XP)
 │   ├── audit-log.md               # MEE6-parity audit logging (24 events → log channel)
 │   ├── ticketing.md               # MEE6-parity support tickets (panels, lifecycle, transcript)
+│   ├── whatsapp-intake.md         # WhatsApp 1:1 support intake — compliant scope, NOT group moderation
 │   ├── support-taxonomy.md        # Tag taxonomy, priorities, SLAs, routing
 │   ├── scam-patterns.md           # Multilingual (EN+PT) scam catalog + case studies
 │   ├── security.md                # Threat model: injection, evasion, ReDoS, abuse, privacy
@@ -285,6 +290,7 @@ community-moderation/
 │   ├── moderate-message.ts        # Multilingual scorer + action decision (+ external signals)
 │   ├── classify-and-route.ts      # Support classification + persona routing
 │   ├── ticketing.ts               # Ticket lifecycle core (MEE6 parity): panels, state machine, transcript
+│   ├── whatsapp-intake.ts         # WhatsApp Cloud API: webhook parsing, scam-check/ticket routing, signature verify
 │   ├── llm-adjudicator.ts         # Gray-zone LLM adjudication (injected judge)
 │   ├── enrich-token.ts            # Token/address risk via injected lookup
 │   ├── member-store.ts            # MemberStore interface + in-memory impl
@@ -296,6 +302,8 @@ community-moderation/
 │   ├── discord/
 │   │   ├── bot.ts                 # Reference discord.js bot (full wiring)
 │   │   └── ticketing.ts           # Discord ticketing: panel button → channel, /ticket-* commands, transcript
+│   ├── whatsapp/
+│   │   └── bot.ts                 # WhatsApp Cloud API webhook server (1:1 intake — NOT group moderation)
 │   ├── mcp/
 │   │   └── server.ts              # MCP server (moderate/classify/scan_urls tools)
 │   └── ci/

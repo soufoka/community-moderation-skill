@@ -2,6 +2,16 @@
 
 All notable changes to this skill are documented here.
 
+## [1.3.0] — 2026-06-27
+
+### Added
+- **WhatsApp support intake — compliant 1:1 channel, NOT group moderation.** WhatsApp has no API, official or otherwise, to read or moderate a group chat — so this adds a member-initiated DM channel on the official WhatsApp Business Cloud API instead, reusing the existing core rather than forking it:
+  - `examples/whatsapp-intake.ts` (pure, tested): parses the Cloud API webhook payload (`parseCloudApiWebhook`, ignoring non-text/status events without throwing), decides scam-check vs. support-ticket intent (`looksLikeScamCheck`), renders the advisory scam-check reply and the ticket-ack reply, and verifies the webhook's `X-Hub-Signature-256` HMAC (constant-time compare).
+  - `examples/whatsapp/bot.ts`: a dependency-free Node `http` webhook server (handshake + signature-gated receive) that calls the **same** `moderateMessage`/`scanUrls` (advisory scam-check, no action taken — there's no group to act in) or the **same** `ticketing.ts`/`classify-and-route.ts`/`member-store.ts`/`event-log.ts` core the Discord/Telegram bots use (support path), with the WhatsApp conversation's `wa_id` standing in for a "channel."
+  - `MemberRecord.platform` widened to include `'whatsapp'`; a WhatsApp contact shares the same roster/analytics as Telegram/Discord members (joins/leaves stay 0 for this platform — there's no group to join).
+  - Config in `templates/foka-config.json` → `whatsapp` (non-secret only; token/verify-token/app-secret are env-only). Full compliant-scope writeup, setup steps, and security notes: `resources/whatsapp-intake.md`.
+  - `engines.node` bumped to `>=18` (the adapter uses global `fetch` to call the Graph API). 16 new tests; smoke +6 checks.
+
 ## [1.2.0] — 2026-06-27
 
 ### Added

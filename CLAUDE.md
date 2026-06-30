@@ -11,14 +11,14 @@ This repository is a **Claude Code plugin** that bundles one skill plus its agen
 
 ## What it does
 
-Moderate Solana community groups (Telegram/Discord) and run member support: detect spam, scam/drainer links, raids, and admin impersonation; manage member contacts and reputation; triage and tag support requests; route questions to the right persona — plus content filters, group analytics, a member roster, immunity roles, audit logging, and ticketing. EN/PT/ES (+7 more), evasion-resistant, bans human-gated.
+Moderate Solana community groups (Telegram/Discord) and run member support: detect spam, scam/drainer links, raids, and admin impersonation; manage member contacts and reputation; triage and tag support requests; route questions to the right persona — plus content filters, group analytics, a member roster, immunity roles, audit logging, and ticketing. EN/PT/ES (+7 more), evasion-resistant, bans human-gated. Also includes a compliant 1:1 WhatsApp support-intake channel (Business Cloud API) — not group moderation, which WhatsApp has no API for.
 
 ## How to use
 
 - **Moderation:** call the logic in [skills/community-moderation/examples/moderate-message.ts](skills/community-moderation/examples/moderate-message.ts) (normalize → score → action). Never auto-ban; escalate irreversible actions.
 - **Support:** classify + route via [skills/community-moderation/examples/classify-and-route.ts](skills/community-moderation/examples/classify-and-route.ts).
 - **On-chain enrichment:** for token/address shills, compose with `birdeye`/`helius`/`wallet-analysis` ([skills/community-moderation/examples/enrich-token.ts](skills/community-moderation/examples/enrich-token.ts)).
-- **Deploy:** reference bots in [skills/community-moderation/examples/telegram](skills/community-moderation/examples/telegram/bot.ts) / [discord](skills/community-moderation/examples/discord/bot.ts), or expose over MCP ([skills/community-moderation/examples/mcp/server.ts](skills/community-moderation/examples/mcp/server.ts)).
+- **Deploy:** reference bots in [skills/community-moderation/examples/telegram](skills/community-moderation/examples/telegram/bot.ts) / [discord](skills/community-moderation/examples/discord/bot.ts) / [whatsapp](skills/community-moderation/examples/whatsapp/bot.ts) (1:1 intake only), or expose over MCP ([skills/community-moderation/examples/mcp/server.ts](skills/community-moderation/examples/mcp/server.ts)).
 
 ## Non-negotiables
 

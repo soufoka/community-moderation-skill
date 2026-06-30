@@ -18,7 +18,7 @@ export interface MemberRecord {
   id: string; // stable platform id (NOT the handle)
   handle: string; // @username (the "Username" column) — may change; id is the key
   displayName?: string; // the "Name" column (first+last / server nick)
-  platform: 'telegram' | 'discord';
+  platform: 'telegram' | 'discord' | 'whatsapp';
   joinedAt: string; // ISO — first seen
   lastSeenAt: string; // ISO — last activity
   leftAt?: string; // ISO — set when the member leaves (drives the "Left" roster tab)
@@ -52,7 +52,7 @@ export const DEFAULT_CONTACT_POLICY: ContactPolicy = {
 export function newMember(
   id: string,
   handle: string,
-  platform: 'telegram' | 'discord',
+  platform: 'telegram' | 'discord' | 'whatsapp',
   displayName?: string,
 ): MemberRecord {
   const now = new Date().toISOString();

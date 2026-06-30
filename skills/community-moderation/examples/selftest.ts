@@ -4,6 +4,7 @@
  * Non-ASCII inputs use literal Unicode so they validate exactly what they claim.
  */
 import assert from 'node:assert';
+import { createHmac } from 'node:crypto';
 import { normalizeForMatch, scanUrls, scanWithUnshorten } from './normalize';
 import { moderateMessage } from './moderate-message';
 import { classifyMessage } from './classify-and-route';
@@ -19,6 +20,7 @@ import { isImmune, explainImmunity, formatImmunityPolicy } from './immunity';
 import { renderHelp, ADMIN_COMMANDS } from './commands-help';
 import { AuditLogger, shouldLog, eventKey } from './audit-log';
 import { InMemoryTicketStore, openTicketForUser, claim, close, reopen, canManageTickets, isCommandEnabled } from './ticketing';
+import { parseCloudApiWebhook, looksLikeScamCheck, verifyWebhookSignature } from './whatsapp-intake';
 import { EVAL_CASES } from './eval-cases';
 
 let passed = 0;
@@ -182,6 +184,23 @@ async function main(): Promise<void> {
     check('ticket claim→close→reopen', claim(t, 'modA').ok && close(t, 'modA').ok && reopen(t, 'modA').ok && t.status === 'claimed');
     check('ticket manager gate', canManageTickets(['Moderator'], tpanel) && !canManageTickets(['Member'], tpanel));
     check('ticket command defaults (claim off, close on)', isCommandEnabled(undefined, 'claim') === false && isCommandEnabled(undefined, 'close') === true);
+  }
+
+  // --- WhatsApp support intake (1:1 only — NOT group moderation; see resources/whatsapp-intake.md) ---
+  {
+    const webhook = { entry: [{ changes: [{ value: {
+      contacts: [{ wa_id: '5511999999999', profile: { name: 'Foka' } }],
+      messages: [{ id: 'wamid.1', from: '5511999999999', timestamp: '1719500000', type: 'text', text: { body: 'is this a scam? http://evil.com' } }],
+    } }] }] };
+    const parsed = parseCloudApiWebhook(webhook);
+    check('whatsapp parses a text message', parsed.length === 1 && parsed[0].from === '5511999999999' && parsed[0].name === 'Foka');
+    check('whatsapp ignores a status-only webhook', parseCloudApiWebhook({ entry: [{ changes: [{ value: { statuses: [{}] } }] }] }).length === 0);
+    check('whatsapp scam-check trigger (URL)', looksLikeScamCheck('check http://evil.com') === true);
+    check('whatsapp normal question is not a scam-check', looksLikeScamCheck('como envio minha submissao?') === false);
+    const body = JSON.stringify(webhook);
+    const sig = 'sha256=' + createHmac('sha256', 'secret').update(body, 'utf8').digest('hex');
+    check('whatsapp webhook signature verifies', verifyWebhookSignature(body, sig, 'secret') === true);
+    check('whatsapp webhook signature rejects tampering', verifyWebhookSignature(body + 'x', sig, 'secret') === false);
   }
 
   // --- token enrichment (injected lookup) ---

@@ -18,7 +18,7 @@ Foka AI is a tireless helper that reads every message in your group and asks two
 - **Acting safely.** When it spots a scam it removes the message and quietly alerts the human moderators — but it **never bans anyone on its own**; a human always makes the serious calls. And it won't punish trusted mods (they're usually the ones *warning* about scams).
 - **Helping members.** For normal questions ("my wallet won't connect", "where's my payout?") it sorts them by topic and urgency and routes them to the right person.
 
-Open-source (MIT), with 240 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
+Open-source (MIT), with 256 automated tests — runs as a Telegram/Discord bot or plugs into AI tools via MCP.
 
 ## Features
 
@@ -28,11 +28,12 @@ Open-source (MIT), with 240 automated tests — runs as a Telegram/Discord bot o
 - **Solana scam catalog** — drainers, seed-phrase phishing, admin impersonation, fake giveaways, honeypots — extensible and versioned.
 - **Channel-wide ping guard** — `@everyone`/`@here`/`@all` from a non-admin is removed (configurable token list); admins exempt via immunity/trust.
 - **Community operations (Combot + MEE6 parity)** — content-type [filters](skills/community-moderation/resources/content-filters.md), group [analytics + activity heatmap](skills/community-moderation/resources/analytics.md), a [member roster](skills/community-moderation/resources/member-directory.md), [immunity roles](skills/community-moderation/resources/moderation-policy.md), [audit logging](skills/community-moderation/resources/audit-log.md), and [ticketing](skills/community-moderation/resources/ticketing.md), with admin slash-commands (`/stats`, `/members`, `/immunity`, `/help`).
+- **WhatsApp support intake** — a compliant 1:1 channel (Business Cloud API) where members DM the official number for a scam-check or a support ticket, sharing the same detection/ticketing core. **Not group moderation** — WhatsApp has no API for that. See [resources/whatsapp-intake.md](skills/community-moderation/resources/whatsapp-intake.md).
 - **Support triage + routing** — 11-tag taxonomy with P1–P4 SLAs and persona/channel routing.
 - **Gray-zone LLM adjudication** — ambiguous scores get an optional, **injection-safe** LLM second opinion.
 - **Cross-skill composition** — pulls on-chain risk from `birdeye`/`helius`/`wallet-analysis` to expose honeypots a lexicon can't see.
 - **Safe by design** — bans/kicks are human-gated; the agent rate-limits itself, ignores other bots, and is idempotent.
-- **Deployable** — reference [Telegram](skills/community-moderation/examples/telegram/bot.ts) + [Discord](skills/community-moderation/examples/discord/bot.ts) bots and an [MCP server](skills/community-moderation/examples/mcp/server.ts).
+- **Deployable** — reference [Telegram](skills/community-moderation/examples/telegram/bot.ts) + [Discord](skills/community-moderation/examples/discord/bot.ts) bots, a [WhatsApp intake webhook](skills/community-moderation/examples/whatsapp/bot.ts), and an [MCP server](skills/community-moderation/examples/mcp/server.ts).
 
 ## Quickstart
 
@@ -94,7 +95,7 @@ community-moderation-skill/
 │       ├── SKILL.md         # Main agent instructions
 │       ├── resources/       # Policy, taxonomy, scam catalog, security, schemas
 │       ├── docs/            # Quickstart + triggering eval set
-│       ├── examples/        # Pure TS logic + Telegram/Discord bots + MCP server
+│       ├── examples/        # Pure TS logic + Telegram/Discord/WhatsApp bots + MCP server
 │       ├── templates/       # foka-config.json
 │       ├── tests/           # vitest suite (+ regression corpus)
 │       └── rules/           # moderation rules

@@ -30,6 +30,12 @@
     "rulesUrl": "REPLACE_ME",
     "_note": "Sent to new members on join. Placeholders: {name} {community} {rules}. The member's name is sanitized (URLs stripped) before insertion. Set enabled=false to turn off."
   },
+  "whatsapp": {
+    "enabled": false,
+    "phoneNumberId": "REPLACE_ME",
+    "managerRoles": ["Moderator"],
+    "_note": "WhatsApp support intake (examples/whatsapp/bot.ts) — 1:1 ONLY, via the official Business Cloud API. WhatsApp has no API, official or otherwise, to read or moderate a GROUP chat — this is NOT a group-moderation channel, it's a member-initiated DM intake reusing the same ticketing/classify-and-route/member-store core as Telegram/Discord. A member who DMs the official number gets either an advisory scam-check (link/claim scored by the same scorer, no action taken) or a routed support ticket. Secrets (access token, verify token, app secret) come from env (WHATSAPP_TOKEN / WHATSAPP_VERIFY_TOKEN / WHATSAPP_APP_SECRET) — never this file. See resources/whatsapp-intake.md."
+  },
   "trust": {
     "promoteAfterMessages": 5,
     "promoteAfterDays": 2,
