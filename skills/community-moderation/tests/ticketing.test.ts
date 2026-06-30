@@ -177,6 +177,43 @@ describe('ticketing — categories & rendering', () => {
     expect((await store.byChannel('chan-123'))?.id).toBe(t.id);
   });
 
+  it('byChannel prefers a LIVE ticket over an earlier-inserted one sharing the same channelId', async () => {
+    // Regression: a long-lived 1:1 channel (e.g. a WhatsApp wa_id) can have multiple
+    // ticket records over time. byChannel must find the current live one, not just the
+    // first ever inserted — otherwise a closed ticket "hides" a newer open one forever.
+    const store = new InMemoryTicketStore();
+    const t1 = (await openTicketForUser(store, panel, { id: 'u1' })).ticket!;
+    t1.channelId = 'wa-5511999999999';
+    close(t1, 'mod');
+    await store.update(t1);
+
+    const t2 = (await openTicketForUser(store, panel, { id: 'u1' })).ticket!; // a second ticket record, same channel
+    t2.channelId = 'wa-5511999999999';
+    await store.update(t2);
+
+    const found = await store.byChannel('wa-5511999999999');
+    expect(found?.id).toBe(t2.id); // the live one, not t1 (which was inserted first)
+    expect(found?.status).toBe('open');
+  });
+
+  it('byChannel falls back to the most recently created match when none are live', async () => {
+    const store = new InMemoryTicketStore();
+    const t1 = (await openTicketForUser(store, panel, { id: 'u1' })).ticket!;
+    t1.channelId = 'wa-1';
+    t1.createdAt = '2026-01-01T00:00:00Z';
+    close(t1, 'mod');
+    await store.update(t1);
+
+    const t2 = (await openTicketForUser(store, panel, { id: 'u1' })).ticket!;
+    t2.channelId = 'wa-1';
+    t2.createdAt = '2026-02-01T00:00:00Z';
+    close(t2, 'mod');
+    await store.update(t2);
+
+    const found = await store.byChannel('wa-1');
+    expect(found?.id).toBe(t2.id); // newer of the two closed tickets
+  });
+
   it('remove() rolls back a ticket so it no longer counts toward maxOpenPerUser', async () => {
     const store = new InMemoryTicketStore();
     const t = (await openTicketForUser(store, panel, { id: 'u1' })).ticket!;

@@ -113,14 +113,22 @@ function escapeRe(s: string): string {
 // RAW text (the platform only pings on the literal ASCII token; a homoglyph @everyоne
 // can't ping). The `@` must sit at a mention position (start or after a non-word char) so
 // `name@everyone.com` isn't flagged. An empty token list disables the check (returns null).
+//
+// moderateMessage is also called per-request from the MCP server with caller-supplied
+// massPingTokens, so the cache key must be collision-free (JSON.stringify, not a plain
+// join — a token containing the join delimiter, e.g. "a|b", must not collide with the
+// two-token list ["a","b"]) and the cache itself is capped to bound memory under a
+// long-lived process fed many distinct token lists.
+const MASS_PING_CACHE_MAX = 200;
 const massPingCache = new Map<string, RegExp | null>();
 function massPingMatcher(tokens?: string[]): RegExp | null {
   const list = (tokens ?? DEFAULT_MASS_PING_TOKENS)
     .map((t) => t.toLowerCase().replace(/^@+/, '').trim())
     .filter(Boolean);
-  const key = list.join('|');
+  const key = JSON.stringify(list);
   if (massPingCache.has(key)) return massPingCache.get(key)!;
   const re = list.length ? new RegExp('(?:^|[^\\w@])@(' + list.map(escapeRe).join('|') + ')\\b', 'i') : null;
+  if (massPingCache.size >= MASS_PING_CACHE_MAX) massPingCache.clear();
   massPingCache.set(key, re);
   return re;
 }

@@ -11,13 +11,13 @@ import { z } from 'zod';
 import { moderateMessage, TrustState } from '../moderate-message';
 import { classifyMessage } from '../classify-and-route';
 import { scanUrls } from '../normalize';
-import { applyContentFilters, ContentFilter, ContentFilterConfig } from '../content-filters';
+import { applyContentFilters, CONTENT_FILTERS, ContentFilter, ContentFilterConfig } from '../content-filters';
 import { isImmune } from '../immunity';
 import { buildReport, GroupEvent } from '../analytics';
 
 const TRUST = z.enum(['NEW', 'MEMBER', 'TRUSTED', 'FLAGGED', 'MUTED', 'BANNED']);
 
-const server = new McpServer({ name: 'foka-ai', version: '1.3.0' });
+const server = new McpServer({ name: 'foka-ai', version: '1.3.1' });
 
 server.tool(
   'moderate_message',
@@ -71,7 +71,7 @@ server.tool(
   'apply_content_filters',
   'Resolve the moderation action for a message from the content types it carries (links, stickers, gifs, forwards, mentions, …) and the configured content filters (Combot "Filters" parity). Returns the strictest action.',
   {
-    present: z.array(z.string()),
+    present: z.array(z.enum(CONTENT_FILTERS)),
     config: z.record(z.any()).optional(),
     memberTrust: TRUST.optional(),
     newMemberNoLinks: z.boolean().optional(),

@@ -115,6 +115,20 @@ describe('channel-wide ping (@everyone/@here/@all) from non-admins', () => {
     expect(cfg('@axb here').reasons).not.toContain('mass-ping'); // the '.' is a literal, not a wildcard
     expect(cfg('@a.b literally').reasons).toContain('mass-ping'); // the literal token still matches
   });
+
+  it('does not cache-collide a token containing the join delimiter with a different token list', () => {
+    // Regression: the matcher cache used to key on tokens.join('|'), so massPingTokens
+    // ['a|b'] (one token with a literal pipe) and ['a','b'] (two tokens) both produced the
+    // cache key "a|b" — whichever was compiled first got silently reused for the other.
+    // Under ['a|b'] only the literal substring "a|b" is a token (not 'b' alone); under
+    // ['a','b'] both 'a' and 'b' are independently valid tokens — a real behavioral split.
+    const oneToken = (text: string) => moderateMessage({ text, memberTrust: 'MEMBER', accountAgeDays: 30, massPingTokens: ['a|b'] }).reasons.includes('mass-ping');
+    const twoTokens = (text: string) => moderateMessage({ text, memberTrust: 'MEMBER', accountAgeDays: 30, massPingTokens: ['a', 'b'] }).reasons.includes('mass-ping');
+    // Prime the cache with the one-token list first (the order that triggered the bug).
+    oneToken('@a|b literal pipe token');
+    expect(oneToken('@b alone')).toBe(false); // 'b' alone is NOT a token under ['a|b']
+    expect(twoTokens('@b alone')).toBe(true); // but it IS under ['a','b'] — must not reuse the cached ['a|b'] regex
+  });
 });
 
 describe('false positives stay calm', () => {

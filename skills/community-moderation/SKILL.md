@@ -4,7 +4,7 @@ description: Foka AI — moderate Solana community groups (Telegram, Discord) an
 license: MIT
 metadata:
   author: Foka (Superteam BR)
-  version: 1.3.0
+  version: 1.3.1
 tags:
   - community-moderation
   - moderation

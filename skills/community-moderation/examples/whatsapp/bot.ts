@@ -29,7 +29,7 @@ import {
   formatTicketAck,
   verifyWebhookSignature,
 } from '../whatsapp-intake';
-import { InMemoryTicketStore, openTicketForUser, type TicketPanel } from '../ticketing';
+import { InMemoryTicketStore, openTicketForUser, reopen, type TicketPanel } from '../ticketing';
 import { InMemoryEventLog } from '../event-log';
 
 const TOKEN = process.env.WHATSAPP_TOKEN;
@@ -72,16 +72,36 @@ async function sendWhatsAppText(to: string, body: string): Promise<void> {
   }).catch((err) => console.error('WhatsApp send failed', err)); // never let a reply failure crash the webhook handler
 }
 
+const MAX_BODY_BYTES = 1_000_000; // Cloud API webhook payloads are small JSON; 1MB is generous headroom
+
+/** Reads the request body, rejecting (and destroying the socket) past MAX_BODY_BYTES — a
+ * raw `node:http` server has no built-in payload cap, unlike grammY/discord.js's transports. */
 function readRawBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
-    req.on('data', (c) => chunks.push(c));
+    let total = 0;
+    req.on('data', (c: Buffer) => {
+      total += c.length;
+      if (total > MAX_BODY_BYTES) {
+        req.destroy();
+        reject(new Error('payload too large'));
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
 }
 
-async function handleInbound(from: string, name: string | undefined, text: string, at: string): Promise<void> {
+// Strip control/escape characters (newlines, ANSI, etc.) so attacker-controlled webhook
+// text can't forge or corrupt console/log lines once it flows into console.log below.
+const stripControlChars = (s: string) => s.replace(/[\x00-\x1F\x7F]/g, '');
+
+async function handleInbound(from: string, rawName: string | undefined, rawText: string, at: string): Promise<void> {
+  const name = rawName ? stripControlChars(rawName) : rawName;
+  const text = stripControlChars(rawText);
+
   let rec = await members.get(from);
   if (!rec) {
     rec = newMember(from, from, 'whatsapp', name);
@@ -90,32 +110,41 @@ async function handleInbound(from: string, name: string | undefined, text: strin
     await members.recordMessage(from, at);
   }
   events.record({ type: 'message', memberId: from, handle: from, displayName: name, at }); // no join/leave on WhatsApp — there's no group
+  const ageDays = (Date.now() - Date.parse(rec.joinedAt)) / 86_400_000;
 
   if (looksLikeScamCheck(text)) {
     const findings = scanUrls(text, OFFICIAL_DOMAINS);
-    const decision = moderateMessage({ text, memberTrust: rec.trustState, accountAgeDays: 0, officialDomains: OFFICIAL_DOMAINS });
+    const decision = moderateMessage({ text, memberTrust: rec.trustState, accountAgeDays: ageDays, officialDomains: OFFICIAL_DOMAINS });
     if (decision.escalate) console.log('WHATSAPP ESCALATE', { from, score: decision.score, reasons: decision.reasons });
     await sendWhatsAppText(from, formatScamCheckReply(decision, findings));
     return;
   }
 
-  // Support path: reuse an existing open thread (the WhatsApp conversation IS the
-  // channel — channelId = the sender's wa_id) instead of opening a new ticket per message.
+  // Support path: the WhatsApp conversation IS the "channel" (channelId = the sender's
+  // wa_id), and that id is permanent — reopen the existing ticket on a closed thread
+  // instead of creating a new ticket record under the same channelId. Creating a second
+  // ticket per channelId would make byChannel's "find the live one" ambiguous over time.
   const existing = await tickets.byChannel(from);
-  if (!existing || existing.status === 'closed' || existing.status === 'deleted') {
+  if (!existing) {
     const opened = await openTicketForUser(tickets, WHATSAPP_PANEL, { id: from, handle: from });
     if (opened.ok && opened.ticket) {
       opened.ticket.channelId = from;
       await tickets.update(opened.ticket);
     }
+  } else if (existing.status === 'closed') {
+    reopen(existing, from);
+    await tickets.update(existing);
   }
+  // status 'open'/'claimed': nothing to do, the conversation continues on the live ticket.
+  // status 'deleted' (rare, terminal — e.g. an admin tool nuked it for abuse): leave it;
+  // a new inbound message does not resurrect a deleted ticket.
   const c = classifyMessage(text);
   const r = routeToPersona(c, routeConfig, { handle: from, trustState: rec.trustState }, text.slice(0, 140));
   console.log(r.handoff);
   await sendWhatsAppText(from, formatTicketAck(c.tag));
 }
 
-const server = createServer(async (req: IncomingMessage, res: ServerResponse) => {
+async function routeRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = new URL(req.url ?? '/', 'http://localhost');
 
   if (req.method === 'GET' && url.pathname === '/webhook') {
@@ -135,19 +164,34 @@ const server = createServer(async (req: IncomingMessage, res: ServerResponse) =>
       return;
     }
     res.writeHead(200).end('ok'); // ack immediately; Meta retries on slow/failed responses
-    let body: unknown;
+    let messages: ReturnType<typeof parseCloudApiWebhook> = [];
     try {
-      body = JSON.parse(raw);
-    } catch {
+      messages = parseCloudApiWebhook(JSON.parse(raw));
+    } catch (err) {
+      console.error('webhook payload parse failed', err); // headers already sent; just stop, Meta saw 200 either way
       return;
     }
-    for (const msg of parseCloudApiWebhook(body)) {
+    for (const msg of messages) {
       await handleInbound(msg.from, msg.name, msg.text, msg.at).catch((err) => console.error('inbound handling failed', err));
     }
     return;
   }
 
   res.writeHead(404).end();
+}
+
+const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+  // A raw node:http server has no framework-level error boundary (unlike grammY/discord.js,
+  // which catch handler errors for you) — without this, an aborted upload (readRawBody's
+  // promise rejects) or any other thrown/rejected error becomes an unhandled rejection that
+  // crashes the whole process on a single malformed request.
+  routeRequest(req, res).catch((err) => {
+    console.error('webhook request failed', err);
+    if (!res.headersSent) res.writeHead(500).end();
+    else if (!res.writableEnded) res.end();
+  });
 });
+server.requestTimeout = 30_000; // no framework default here; bound a slow/stalled request
+server.headersTimeout = 10_000;
 
 server.listen(PORT, () => console.log(`WhatsApp support-intake webhook listening on :${PORT}/webhook`));

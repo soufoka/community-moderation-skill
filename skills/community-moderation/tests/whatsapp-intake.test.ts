@@ -77,6 +77,21 @@ describe('looksLikeScamCheck', () => {
     expect(looksLikeScamCheck('es real esto')).toBe(true);
   });
   it('does not flag a normal support question', () => expect(looksLikeScamCheck('como eu envio minha submissao da bounty?')).toBe(false));
+
+  it('flags a scheme-less link (t.me/, discord.gg/, www.) the old naive https?:// regex missed', () => {
+    // Regression: the original check was a naive /https?:\/\// regex, which missed exactly
+    // the link shapes scammers favor on WhatsApp — Telegram/Discord invite shorthands and
+    // bare www. links with no scheme.
+    expect(looksLikeScamCheck('entra no grupo t.me/golpe123')).toBe(true);
+    expect(looksLikeScamCheck('join discord.gg/totally-legit')).toBe(true);
+    expect(looksLikeScamCheck('acessa www.superteam-claim.example')).toBe(true);
+  });
+  it('does not flag a bare, non-suspicious domain mention with no link marker (matches scanUrls’ own conservatism)', () => {
+    // A plain word-with-dots and no scheme/www/shortener marker is deliberately NOT treated
+    // as a link by scanUrls (avoids false positives on ordinary text) — looksLikeScamCheck
+    // inherits that same, intentional selectivity rather than being more aggressive than it.
+    expect(looksLikeScamCheck('confere o superteam.fun quando der')).toBe(false);
+  });
 });
 
 describe('formatScamCheckReply', () => {

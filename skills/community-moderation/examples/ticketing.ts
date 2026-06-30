@@ -171,7 +171,14 @@ export class InMemoryTicketStore implements TicketStore {
     return this.byId.get(id);
   }
   async byChannel(channelId: string): Promise<Ticket | undefined> {
-    return [...this.byId.values()].find((t) => t.channelId === channelId);
+    const matches = [...this.byId.values()].filter((t) => t.channelId === channelId);
+    if (matches.length === 0) return undefined;
+    // A channel id can be reused across multiple ticket records over time (e.g. a 1:1
+    // thread — Telegram/WhatsApp — that gets a fresh ticket after a prior one closes), so
+    // "first inserted" is not "currently live". Prefer a live ticket; else the most recent.
+    const live = matches.find((t) => t.status === 'open' || t.status === 'claimed');
+    if (live) return live;
+    return matches.reduce((latest, t) => (Date.parse(t.createdAt) > Date.parse(latest.createdAt) ? t : latest));
   }
   async update(t: Ticket): Promise<void> {
     this.byId.set(t.id, t);

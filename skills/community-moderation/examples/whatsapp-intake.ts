@@ -17,7 +17,7 @@
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import type { Decision } from './moderate-message';
-import type { UrlFinding } from './normalize';
+import { scanUrls, type UrlFinding } from './normalize';
 
 export interface WhatsAppInboundMessage {
   id: string;
@@ -71,9 +71,14 @@ const SCAM_CHECK_PHRASES = [
   'esto es estafa', 'es real esto', 'es legitimo',
 ];
 
-/** Did the member forward a link/claim to be checked, vs. ask a normal support question? */
+/**
+ * Did the member forward a link/claim to be checked, vs. ask a normal support question?
+ * URL presence is checked via scanUrls' own extraction (scheme'd, t.me/discord.gg-shaped,
+ * and bare-domain links) rather than a separate regex — a naive `https?://` check misses
+ * exactly the bare-domain/shortener shapes (`superteam.gift`, `t.me/...`) scammers use.
+ */
 export function looksLikeScamCheck(text: string): boolean {
-  if (/https?:\/\/\S+/i.test(text)) return true;
+  if (scanUrls(text).length > 0) return true;
   const s = text.toLowerCase();
   return SCAM_CHECK_PHRASES.some((p) => s.includes(p));
 }
