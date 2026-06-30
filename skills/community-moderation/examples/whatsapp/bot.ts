@@ -50,14 +50,13 @@ const routeConfig: RouteConfig = {
 const WHATSAPP_PANEL: TicketPanel = {
   id: 'whatsapp-suporte',
   name: 'Superteam Suporte (WhatsApp)',
-  publishChannel: 'whatsapp', // no real channel exists on this platform; required by TicketPanel, unused here
   managerRoles: ['Moderator'],
   panelMessage: { title: 'Suporte', description: 'Atendimento via WhatsApp' },
   types: [{ id: 'duvida', label: 'Dúvida' }],
   introMessage: 'Olá {opener}! Recebemos sua mensagem e já vamos te ajudar.',
-  openCategory: '', // Discord-channel-category concept; not applicable on WhatsApp
-  closedCategory: '',
   maxOpenPerUser: 1,
+  // publishChannel/openCategory/closedCategory omitted — Discord-only concepts (a guild
+  // channel/category structure) this 1:1 platform has no equivalent of.
 };
 
 const members = new InMemoryMemberStore(); // swap for your DB-backed MemberStore

@@ -121,11 +121,13 @@ client.on(Events.MessageCreate, async (message: Message) => {
       await message.reply({ content: fence(renderHelp('!')), ...SAFE_REPLY }).catch(() => {});
     } else if (message.content.startsWith('!ticket-setup')) {
       await message.guild?.commands.set(TICKET_SLASH_COMMANDS).catch(() => {}); // register /ticket-* slash commands
-      const ch = message.guild?.channels.cache.find(
-        (c) => c.type === ChannelType.GuildText && c.name.toLowerCase() === TICKET_PANEL.publishChannel.replace(/^#/, '').toLowerCase(),
-      ) as TextChannel | undefined;
+      const ch = TICKET_PANEL.publishChannel
+        ? (message.guild?.channels.cache.find(
+            (c) => c.type === ChannelType.GuildText && c.name.toLowerCase() === TICKET_PANEL.publishChannel!.replace(/^#/, '').toLowerCase(),
+          ) as TextChannel | undefined)
+        : undefined;
       if (ch) { await publishPanel(ch, TICKET_PANEL); await message.reply(`🎫 Ticket panel published to <#${ch.id}> + /ticket-* commands registered.`).catch(() => {}); }
-      else await message.reply(`⚠️ Channel #${TICKET_PANEL.publishChannel} not found.`).catch(() => {});
+      else await message.reply(`⚠️ Channel #${TICKET_PANEL.publishChannel ?? '(unset)'} not found.`).catch(() => {});
     } else if (message.content.startsWith('!stats')) {
       const report = buildReport(events.all(), last7d(), { tzOffsetMinutes: TZ_OFFSET_MINUTES });
       await message.reply({ content: fence(formatReport(report) + '\n\nActivity heatmap (BRT):\n' + renderHeatmap(report.heatmap)), ...SAFE_REPLY }).catch(() => {});

@@ -66,7 +66,8 @@ function mapColor(c?: ButtonColor): ButtonStyle {
   }
 }
 
-function findCategoryId(guild: ButtonInteraction['guild'], name: string): string | undefined {
+function findCategoryId(guild: ButtonInteraction['guild'], name: string | undefined): string | undefined {
+  if (!name) return undefined; // panel has no category for this platform/panel (e.g. unset on purpose)
   return guild?.channels.cache.find(
     (c) => c.type === ChannelType.GuildCategory && c.name.toLowerCase() === name.toLowerCase(),
   )?.id;

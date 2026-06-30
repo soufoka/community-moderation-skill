@@ -39,15 +39,18 @@ export interface TranscriptConfig {
 export interface TicketPanel {
   id: string;
   name: string; // "Superteam Suporte"
-  publishChannel: string; // #atendimento
   managerRoles: string[]; // @Moderator — who can run ticket commands
   panelMessage: PanelMessage;
   types: TicketButton[]; // one or more "open" buttons
   introMessage: string; // posted inside a new ticket; supports {opener} {ticket} {panel}
-  openCategory: string; // category for new tickets
-  closedCategory: string; // category closed tickets move to
   transcript?: TranscriptConfig;
   maxOpenPerUser?: number; // default 1
+  // The three fields below are Discord-specific (a guild channel/category structure) and
+  // don't apply to a platform with no notion of "channel" or "category" (e.g. WhatsApp's
+  // 1:1 intake, examples/whatsapp/bot.ts) — optional rather than every panel faking a value.
+  publishChannel?: string; // #atendimento — where the panel embed gets posted
+  openCategory?: string; // category for new tickets
+  closedCategory?: string; // category closed tickets move to
 }
 
 export interface Ticket {
@@ -105,7 +108,7 @@ export function canManageTickets(actorRoles: string[] | undefined, panel: Pick<T
 
 // ---- categories ----
 
-export function resolveCategories(panel: TicketPanel, buttonId?: string): { open: string; closed: string } {
+export function resolveCategories(panel: TicketPanel, buttonId?: string): { open?: string; closed?: string } {
   const btn = panel.types.find((b) => b.id === buttonId);
   return { open: btn?.openCategory ?? panel.openCategory, closed: btn?.closedCategory ?? panel.closedCategory };
 }

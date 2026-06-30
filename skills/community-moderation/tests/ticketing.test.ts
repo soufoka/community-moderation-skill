@@ -143,6 +143,23 @@ describe('ticketing — categories & rendering', () => {
     expect(resolveCategories(panel, 'bug').open).toBe('BUGS'); // button override
   });
 
+  it('a panel with no publishChannel/categories (e.g. a 1:1 platform like WhatsApp) works cleanly', () => {
+    // publishChannel/openCategory/closedCategory are Discord-only (guild channel/category)
+    // concepts and optional on TicketPanel — a panel for a platform with no such concept
+    // should not need to fake placeholder values for them.
+    const minimalPanel: TicketPanel = {
+      id: 'wa-suporte',
+      name: 'WhatsApp Suporte',
+      managerRoles: ['Moderator'],
+      panelMessage: { title: 'Suporte', description: 'd' },
+      types: [{ id: 'duvida', label: 'Duvida' }],
+      introMessage: 'oi {opener}',
+      maxOpenPerUser: 1,
+    };
+    expect(resolveCategories(minimalPanel, 'duvida')).toEqual({ open: undefined, closed: undefined });
+    expect(canManageTickets(['Moderator'], minimalPanel)).toBe(true);
+  });
+
   it('channel name is padded', () => expect(ticketChannelName({ number: 7 })).toBe('ticket-0007'));
 
   it('intro fills placeholders', async () => {

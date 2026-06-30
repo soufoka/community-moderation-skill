@@ -20,6 +20,8 @@ Members open private support tickets from a panel button; ticket managers claim 
 | Ticket introduction message | `panel.introMessage` — `{opener}` `{ticket}` `{panel}` are filled; role mentions kept literal |
 | Ticket transcript | `panel.transcript` `{ channel, dmToOpener }` |
 
+`publishChannel` / `openCategory` / `closedCategory` are **optional** on `TicketPanel` — they're Discord-specific (a guild channel/category structure) and don't apply to a platform with no notion of either. The WhatsApp intake's panel ([`resources/whatsapp-intake.md`](whatsapp-intake.md)) omits all three rather than faking placeholder values; `resolveCategories()`/`findCategoryId()` handle the `undefined` case cleanly (no category lookup attempted).
+
 ## The commands
 
 Slash commands, runnable **only inside a ticket channel by a ticket manager** (MEE6 rule). Toggle them in `ticketing.commands`:

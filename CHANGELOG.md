@@ -2,6 +2,11 @@
 
 All notable changes to this skill are documented here.
 
+## [1.3.2] — 2026-06-27
+
+### Changed (cleanup — review follow-up)
+- **`TicketPanel.publishChannel` / `openCategory` / `closedCategory` are now optional.** These are Discord-specific concepts (a guild channel/category structure) that the WhatsApp 1:1 intake had to fake placeholder values for (`publishChannel: 'whatsapp'`, `openCategory: ''`) just to satisfy the shared type. `resolveCategories()` now returns `{ open?: string; closed?: string }`, and the Discord wiring (`findCategoryId`, `!ticket-setup`'s panel lookup) handles the `undefined` case explicitly instead of assuming every panel has these fields. The WhatsApp panel now omits them entirely rather than shoehorning in dead values. No behavior change for Discord (its panel always supplies real values). 1 new regression test (262 total); typecheck and smoke clean.
+
 ## [1.3.1] — 2026-06-27
 
 ### Fixed (bug hunt — multi-angle review of everything since the last security pass)

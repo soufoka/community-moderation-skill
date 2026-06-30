@@ -17,7 +17,7 @@ import { buildReport, GroupEvent } from '../analytics';
 
 const TRUST = z.enum(['NEW', 'MEMBER', 'TRUSTED', 'FLAGGED', 'MUTED', 'BANNED']);
 
-const server = new McpServer({ name: 'foka-ai', version: '1.3.1' });
+const server = new McpServer({ name: 'foka-ai', version: '1.3.2' });
 
 server.tool(
   'moderate_message',
